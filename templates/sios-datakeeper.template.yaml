@@ -343,7 +343,7 @@ Parameters:
     ConstraintDescription: >-
       The S3 bucket name can include numbers, lowercase letters,
       and hyphens (-), but it cannot start or end with a hyphen.
-    Default: aws-quickstart
+    Default: aws-ia-us-east-1
     Description: >-
       Name of the S3 bucket for your copy of the deployment assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new location.
     MinLength: 3
@@ -359,7 +359,7 @@ Parameters:
     AllowedPattern: ^([0-9a-zA-Z!-_\.\*'\(\)/]+/)*$
     ConstraintDescription: >-
       The S3 key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), underscores (_), periods (.), asterisks (*), single quotes ('), open parenthesis ((), close parenthesis ()), and forward slashes (/). End the prefix with a forward slash.
-    Default: quickstart-sios-datakeeper/
+    Default: cfn-ps-sios-datakeeper/
     Description: >-
       S3 key prefix that is used to simulate a folder for your copy of the
       deployment assets. Keep the default prefix unless you are customizing
@@ -660,7 +660,7 @@ Conditions:
   NeedsFSxWitness: !And
     - !Condition UsingAWSManagedAD
     - !Condition ThirdAzIsWitness
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-ia-us-east-1']
 Rules:
   SubnetsInVPC:
     Assertions:
@@ -1121,7 +1121,7 @@ Resources:
               commands:
                 - |
                   New-Item -Type Directory C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart
-                  Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/quickstart-microsoft-utilities/modules/AWSQuickStart/AWSQuickStart.psm1 -LocalFile C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart\AWSQuickStart.psm1 -Region {{QSS3BucketRegion}}
+                  Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/modules/AWSQuickStart/AWSQuickStart.psm1 -LocalFile C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart\AWSQuickStart.psm1 -Region {{QSS3BucketRegion}}
         - name: OSVersionBranch1
           action: aws:branch
           inputs:
@@ -1169,7 +1169,7 @@ Resources:
               sourceType: S3
               sourceInfo:
                 !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}submodules/quickstart-microsoft-utilities/scripts/Install-WMF51.ps1"}'
+                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/Install-WMF51.ps1"}'
                   - S3Bucket: !If
                       - UsingDefaultBucket
                       - !Sub '${QSS3BucketName}-${AWS::Region}'
@@ -1278,7 +1278,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               commands:
-                - Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/quickstart-microsoft-utilities/scripts/EnableCredSsp.ps1 -LocalFile C:\cfn\scripts\EnableCredSsp.ps1 -Region {{QSS3BucketRegion}}
+                - Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/EnableCredSsp.ps1 -LocalFile C:\cfn\scripts\EnableCredSsp.ps1 -Region {{QSS3BucketRegion}}
         - name: EnableCredSSPReboot
           action: aws:runCommand
           onFailure: step:signalfailure
@@ -1325,7 +1325,7 @@ Resources:
               sourceType: S3
               sourceInfo:
                 !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}submodules/quickstart-microsoft-utilities/scripts/Set-Dns.ps1"}'
+                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/Set-Dns.ps1"}'
                   - S3Bucket: !If
                       - UsingDefaultBucket
                       - !Sub '${QSS3BucketName}-${AWS::Region}'
@@ -2353,7 +2353,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               commands:
-                - Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/quickstart-microsoft-utilities/scripts/DisableCredSsp.ps1 -LocalFile C:\cfn\scripts\DisableCredSsp.ps1 -Region {{QSS3BucketRegion}}
+                - Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/DisableCredSsp.ps1 -LocalFile C:\cfn\scripts\DisableCredSsp.ps1 -Region {{QSS3BucketRegion}}
         - name: DisableCredSSPReboot
           action: aws:runCommand
           onFailure: step:signalfailure

@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: This template creates 2 Windows 2016 Active Directory Domain Controllers into private subnets in separate Availability Zones inside a VPC. The default Domain Administrator password will be
   the one retrieved from the instance.  For adding members to the domain, ensure that they are launched into the domain member security group created by this template and then configure them to use the
   AD instances fixed private IP addresses as the DNS server. **WARNING** This template creates Amazon EC2 Windows instance and related resources. You will be billed for the AWS resources used if you create
-  a stack from this template. QS(0001)
+  a stack from this template. QS(0001) (qs-1ui8pln0o)
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

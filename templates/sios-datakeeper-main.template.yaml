@@ -755,7 +755,7 @@ Resources:
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}${QSADTemplate}
         - QSADTemplate: !If
             - UseAWSManagedAD
-            - submodules/cfn-ps-microsoft-activedirectory/templates/ad-3.template
+            - submodules/cfn-ps-microsoft-activedirectory/templates/ad-3.template.yaml
             - templates/ad.template.yaml
           S3Region: !If
             - UsingDefaultBucket
@@ -807,7 +807,7 @@ Resources:
     Properties:
       TemplateURL:
         Fn::Sub:
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/templates/rdgw-domain.template'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/templates/rdgw-domain.template.yaml'
           - S3Region: !If
               - UsingDefaultBucket
               - !Ref AWS::Region

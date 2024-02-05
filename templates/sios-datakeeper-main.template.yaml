@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
   This template deploys two or three Windows Server Failover Clustering (WSFC) nodes with SQL
   Server and DataKeeper replication software. This template also deploys the
@@ -227,16 +227,17 @@ Parameters:
     Description: Amazon EC2 instance type for the first Active Directory instance.
     Type: String
   ADServer1NetBIOSName:
-    AllowedPattern: '[a-zA-Z0-9]+'
+    AllowedPattern: "[a-zA-Z0-9]+"
     Default: DC1
     Description: NetBIOS name of the first Active Directory server (up to 15 characters).
-    MaxLength: '15'
-    MinLength: '1'
+    MaxLength: "15"
+    MinLength: "1"
     Type: String
   ADServer1PrivateIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 10.0.0.10
-    Description: Fixed private IP address for the first Active Directory server, located in
+    Description:
+      Fixed private IP address for the first Active Directory server, located in
       Availability Zone 1.
     Type: String
   ADServer2InstanceType:
@@ -257,16 +258,17 @@ Parameters:
     Description: Amazon EC2 instance type for the second Active Directory instance.
     Type: String
   ADServer2NetBIOSName:
-    AllowedPattern: '[a-zA-Z0-9]+'
+    AllowedPattern: "[a-zA-Z0-9]+"
     Default: DC2
     Description: NetBIOS name of the second Active Directory server (up to 15 characters).
-    MaxLength: '15'
-    MinLength: '1'
+    MaxLength: "15"
+    MinLength: "1"
     Type: String
   ADServer2PrivateIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 10.0.32.10
-    Description: Fixed private IP address for the second Active Directory, server located in
+    Description:
+      Fixed private IP address for the second Active Directory, server located in
       Availability Zone 2.
     Type: String
   AMIType:
@@ -281,51 +283,51 @@ Parameters:
     Type: List<AWS::EC2::AvailabilityZone::Name>
   ClusterNodeOSServerVersion:
     AllowedValues:
-      - WS2012R2
       - WS2016
       - WS2019
+      - WS2022
     Default: WS2019
     Description: Version of Windows Server OS for cluster nodes.
     Type: String
   DomainAdminPassword:
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     Description: Password for the domain administrator user. Must be at least 8 characters containing letters, numbers, and symbols.
-    MaxLength: '32'
-    MinLength: '8'
-    NoEcho: 'true'
+    MaxLength: "32"
+    MinLength: "8"
+    NoEcho: "true"
     Type: String
   DomainAdminUser:
-    AllowedPattern: '[a-zA-Z0-9]*'
+    AllowedPattern: "[a-zA-Z0-9]*"
     Default: admin
     Description: User name for the domain administrator account. This is separate from the default administrator account.
-    MaxLength: '25'
-    MinLength: '5'
+    MaxLength: "25"
+    MinLength: "5"
     Type: String
   DomainDNSName:
     AllowedPattern: '[a-zA-Z0-9]+\..+'
     Default: datakeeper.local
     Description: Fully qualified domain name (FQDN) of the forest root domain (e.g., example.com).
-    MaxLength: '25'
-    MinLength: '3'
+    MaxLength: "25"
+    MinLength: "3"
     Type: String
   DomainNetBIOSName:
-    AllowedPattern: '[a-zA-Z0-9]+'
+    AllowedPattern: "[a-zA-Z0-9]+"
     Default: DATAKEEPER
     Description: NetBIOS name of the domain for users of earlier versions of Windows (up to 15 characters).
-    MaxLength: '15'
-    MinLength: '1'
+    MaxLength: "15"
+    MinLength: "1"
     Type: String
   KeyPairName:
     Description: Public-private key pairs allow you to securely connect to your instance after it launches.
     Type: AWS::EC2::KeyPair::KeyName
   NumberOfRDGWHosts:
     AllowedValues:
-      - '0'
-      - '1'
-      - '2'
-      - '3'
-      - '4'
-    Default: '1'
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+    Default: "1"
     Description: Enter the number of RD Gateway hosts to create.
     Type: String
   PrivateSubnet1CIDR:
@@ -373,7 +375,7 @@ Parameters:
     MaxLength: 63
     Type: String
   QSS3BucketRegion:
-    Default: 'us-east-1'
+    Default: "us-east-1"
     Description: >-
       AWS Region where the S3 bucket (QSS3BucketName) is hosted. Keep
       the default Region unless you are customizing the template. Changing the Region updates code references to point to a new location. When using your own bucket, specify the Region.
@@ -422,31 +424,31 @@ Parameters:
     Description: Amazon EC2 instance type for the RD Gateway instance.
     Type: String
   SIOSLicenseKeyFtpURL:
-    Default: ''
+    Default: ""
     Description: URL used to obtain license key for SIOS DataKeeper.
     Type: String
   SQLServerVersion:
     AllowedValues:
       - None
-      - '2016'
-      - '2017'
-    Default: '2017'
+      - "2016"
+      - "2017"
+    Default: "2017"
     Description: Version of MS SQL Server to install. Choose "None" if you don't want to install SQL Server.
     Type: String
   SQLServiceAccount:
-    AllowedPattern: '[a-zA-Z0-9]*'
+    AllowedPattern: "[a-zA-Z0-9]*"
     Default: sqlsa
     Description: User name for the SQL Server service account. This account is a domain user.
-    MaxLength: '25'
-    MinLength: '5'
+    MaxLength: "25"
+    MinLength: "5"
     Type: String
   SQLServiceAccountPassword:
     AllowedPattern: (?=^(?![\s\S]))|(?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
-    Default: ''
+    Default: ""
     Description: Password for the SQL Server account. Must be at least 8 characters containing letters, numbers, and symbols. Keep blank if you don't want to install SQL Server.
-    MaxLength: '32'
-    MinLength: '0'
-    NoEcho: 'true'
+    MaxLength: "32"
+    MinLength: "0"
+    NoEcho: "true"
     Type: String
   ThirdAZ:
     AllowedValues:
@@ -463,16 +465,16 @@ Parameters:
     Description: CIDR block for the VPC.
     Type: String
   Volume1Iops:
-    Default: '1000'
+    Default: "1000"
     Description: IOPS for the SQL data drive. (Used only when data volume type is io1.)
-    MaxValue: '20000'
-    MinValue: '100'
+    MaxValue: "20000"
+    MinValue: "100"
     Type: Number
   Volume1Size:
-    Default: '100'
+    Default: "100"
     Description: Volume size (in GiB) for the SQL data drive.
-    MaxValue: '16000'
-    MinValue: '100'
+    MaxValue: "16000"
+    MinValue: "100"
     Type: Number
   Volume1Type:
     AllowedValues:
@@ -523,16 +525,17 @@ Parameters:
     Description: Amazon EC2 instance type for the first WSFC node. If you're concerned about performance, SIOS recommends r3.xlarge or larger.
     Type: String
   WSFCNode1NetBIOSName:
-    AllowedPattern: '[a-zA-Z0-9]+'
+    AllowedPattern: "[a-zA-Z0-9]+"
     Default: WSFCNode1
     Description: NetBIOS name of the first WSFC node (up to 15 characters).
-    MaxLength: '15'
-    MinLength: '1'
+    MaxLength: "15"
+    MinLength: "1"
     Type: String
   WSFCNode1PrivateIP1:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 10.0.0.100
-    Description: Primary private address for the first WSFC node located in Availability
+    Description:
+      Primary private address for the first WSFC node located in Availability
       Zone 1
     Type: String
   WSFCNode1PrivateIP2:
@@ -586,16 +589,17 @@ Parameters:
     Description: Amazon EC2 instance type for the second WSFC node. If you're concerned about performance, SIOS recommends r3.xlarge or larger.
     Type: String
   WSFCNode2NetBIOSName:
-    AllowedPattern: '[a-zA-Z0-9]+'
+    AllowedPattern: "[a-zA-Z0-9]+"
     Default: WSFCNode2
     Description: NetBIOS name of the second WSFC node (up to 15 characters).
-    MaxLength: '15'
-    MinLength: '1'
+    MaxLength: "15"
+    MinLength: "1"
     Type: String
   WSFCNode2PrivateIP1:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 10.0.32.100
-    Description: Primary private IP address for the second WSFC node located in Availability
+    Description:
+      Primary private IP address for the second WSFC node located in Availability
       Zone 2.
     Type: String
   WSFCNode2PrivateIP2:
@@ -645,11 +649,12 @@ Parameters:
       - x1e.16xlarge
       - x1e.32xlarge
     Default: i3.xlarge
-    Description: (Optional) Amazon EC2 instance type for the third WSFC node. Full cluster nodes must be EBS-optimized types,
+    Description:
+      (Optional) Amazon EC2 instance type for the third WSFC node. Full cluster nodes must be EBS-optimized types,
       but a file-share-witness host can be any available instance type. If you're concerned about performance, SIOS recommends r3.xlarge or larger.
     Type: String
   WSFCNode3NetBIOSName:
-    AllowedPattern: '[a-zA-Z0-9]+'
+    AllowedPattern: "[a-zA-Z0-9]+"
     Default: WSFCNode3
     Description: (Optional when ThirdAZ is set to "full") NetBIOS name of the second WSFC node (up to 15 characters)
     MaxLength: 15
@@ -668,10 +673,10 @@ Parameters:
   WSFCNode3PrivateIP3:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 10.0.64.102
-    Description:  (Optional when ThirdAZ is set to "full") Third private IP address for the SQL Server network name on the third WSFC node.
+    Description: (Optional when ThirdAZ is set to "full") Third private IP address for the SQL Server network name on the third WSFC node.
     Type: String
   WSFCWitnessNetBIOSName:
-    AllowedPattern: '[a-zA-Z0-9]+'
+    AllowedPattern: "[a-zA-Z0-9]+"
     Default: WSFCWitness
     Description: (Optional when ThirdAZ is set to "witness") NetBIOS name of the second WSFC node (up to 15 characters).
     MaxLength: 15
@@ -695,59 +700,59 @@ Parameters:
 Mappings:
   AWSLatestAMIMap:
     LATEST:
-      WS2012R2: /aws/service/ami-windows-latest/Windows_Server-2012-R2_RTM-English-64Bit-Base
       WS2016: /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
       WS2019: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+      WS2022: /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
 Conditions:
   IsTwoAz: !Equals [!Ref ThirdAZ, none]
   UseAWSDirectoryServiceEE: !Equals
-    - !Ref 'ADScenarioType'
+    - !Ref "ADScenarioType"
     - AWS Directory Service for Microsoft AD (Enterprise Edition)
   UseSelfManagedAD: !Equals
-    - !Ref 'ADScenarioType'
+    - !Ref "ADScenarioType"
     - Microsoft AD on Amazon EC2
   UseAWSManagedAD: !Not [Condition: UseSelfManagedAD]
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-ia-us-east-1']
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, "aws-ia-us-east-1"]
   IncludeRDGW: !Not
     - !Equals
       - !Ref NumberOfRDGWHosts
-      - '0'
+      - "0"
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL:
         Fn::Sub:
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-aws-vpc/templates/aws-vpc.template.yaml'
+          - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-aws-vpc/templates/aws-vpc.template.yaml"
           - S3Region: !If
               - UsingDefaultBucket
               - !Ref AWS::Region
               - !Ref QSS3BucketRegion
             S3Bucket: !If
               - UsingDefaultBucket
-              - !Sub '${QSS3BucketName}-${AWS::Region}'
+              - !Sub "${QSS3BucketName}-${AWS::Region}"
               - !Ref QSS3BucketName
       Parameters:
         AvailabilityZones: !Join
-          - ','
-          - !Ref 'AvailabilityZones'
+          - ","
+          - !Ref "AvailabilityZones"
         NumberOfAZs: !If
           - IsTwoAz
-          - '2'
-          - '3'
-        PrivateSubnet1ACIDR: !Ref 'PrivateSubnet1CIDR'
-        PrivateSubnet2ACIDR: !Ref 'PrivateSubnet2CIDR'
+          - "2"
+          - "3"
+        PrivateSubnet1ACIDR: !Ref "PrivateSubnet1CIDR"
+        PrivateSubnet2ACIDR: !Ref "PrivateSubnet2CIDR"
         PrivateSubnet3ACIDR: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'PrivateSubnet3CIDR'
-        PublicSubnet1CIDR: !Ref 'PublicSubnet1CIDR'
-        PublicSubnet2CIDR: !Ref 'PublicSubnet2CIDR'
+          - !Ref "AWS::NoValue"
+          - !Ref "PrivateSubnet3CIDR"
+        PublicSubnet1CIDR: !Ref "PublicSubnet1CIDR"
+        PublicSubnet2CIDR: !Ref "PublicSubnet2CIDR"
         PublicSubnet3CIDR: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'PublicSubnet3CIDR'
-        VPCCIDR: !Ref 'VPCCIDR'
+          - !Ref "AWS::NoValue"
+          - !Ref "PublicSubnet3CIDR"
+        VPCCIDR: !Ref "VPCCIDR"
   ADStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -763,176 +768,181 @@ Resources:
             - !Ref QSS3BucketRegion
           S3Bucket: !If
             - UsingDefaultBucket
-            - !Sub '${QSS3BucketName}-${AWS::Region}'
+            - !Sub "${QSS3BucketName}-${AWS::Region}"
             - !Ref QSS3BucketName
       Parameters: !If
         - UseSelfManagedAD
-        - ADServer1InstanceType: !Ref 'ADServer1InstanceType'
-          ADServer1NetBIOSName: !Ref 'ADServer1NetBIOSName'
-          ADServer1PrivateIP: !Ref 'ADServer1PrivateIP'
-          ADServer2InstanceType: !Ref 'ADServer2InstanceType'
-          ADServer2NetBIOSName: !Ref 'ADServer2NetBIOSName'
-          ADServer2PrivateIP: !Ref 'ADServer2PrivateIP'
-          DomainAdminPassword: !Ref 'DomainAdminPassword'
-          DomainAdminUser: !Ref 'DomainAdminUser'
-          DomainDNSName: !Ref 'DomainDNSName'
-          DomainNetBIOSName: !Ref 'DomainNetBIOSName'
-          KeyPairName: !Ref 'KeyPairName'
-          PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'
-          PrivateSubnet2ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet2AID'
-          QSS3BucketName: !Ref 'QSS3BucketName'
-          QSS3BucketRegion: !Ref 'QSS3BucketRegion'
-          QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
-          VPCCIDR: !Ref 'VPCCIDR'
-          VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
+        - ADServer1InstanceType: !Ref "ADServer1InstanceType"
+          ADServer1NetBIOSName: !Ref "ADServer1NetBIOSName"
+          ADServer1PrivateIP: !Ref "ADServer1PrivateIP"
+          ADServer2InstanceType: !Ref "ADServer2InstanceType"
+          ADServer2NetBIOSName: !Ref "ADServer2NetBIOSName"
+          ADServer2PrivateIP: !Ref "ADServer2PrivateIP"
+          DomainAdminPassword: !Ref "DomainAdminPassword"
+          DomainAdminUser: !Ref "DomainAdminUser"
+          DomainDNSName: !Ref "DomainDNSName"
+          DomainNetBIOSName: !Ref "DomainNetBIOSName"
+          KeyPairName: !Ref "KeyPairName"
+          PrivateSubnet1ID: !GetAtt "VPCStack.Outputs.PrivateSubnet1AID"
+          PrivateSubnet2ID: !GetAtt "VPCStack.Outputs.PrivateSubnet2AID"
+          QSS3BucketName: !Ref "QSS3BucketName"
+          QSS3BucketRegion: !Ref "QSS3BucketRegion"
+          QSS3KeyPrefix: !Sub "${QSS3KeyPrefix}"
+          VPCCIDR: !Ref "VPCCIDR"
+          VPCID: !GetAtt "VPCStack.Outputs.VPCID"
         - ADEdition: !If
-          - UseAWSDirectoryServiceEE
-          - Enterprise
-          - Standard
-          DomainAdminPassword: !Ref 'DomainAdminPassword'
-          DomainDNSName: !Ref 'DomainDNSName'
-          DomainNetBIOSName: !Ref 'DomainNetBIOSName'
-          KeyPairName: !Ref 'KeyPairName'
-          MgmtServer: 'false'
-          PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'
-          PrivateSubnet2ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet2AID'
-          QSS3BucketName: !Ref 'QSS3BucketName'
-          QSS3BucketRegion: !Ref 'QSS3BucketRegion'
-          QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}submodules/cfn-ps-microsoft-activedirectory/'
-          VPCCIDR: !Ref 'VPCCIDR'
-          VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
+            - UseAWSDirectoryServiceEE
+            - Enterprise
+            - Standard
+          DomainAdminPassword: !Ref "DomainAdminPassword"
+          DomainDNSName: !Ref "DomainDNSName"
+          DomainNetBIOSName: !Ref "DomainNetBIOSName"
+          KeyPairName: !Ref "KeyPairName"
+          MgmtServer: "false"
+          PrivateSubnet1ID: !GetAtt "VPCStack.Outputs.PrivateSubnet1AID"
+          PrivateSubnet2ID: !GetAtt "VPCStack.Outputs.PrivateSubnet2AID"
+          QSS3BucketName: !Ref "QSS3BucketName"
+          QSS3BucketRegion: !Ref "QSS3BucketRegion"
+          QSS3KeyPrefix: !Sub "${QSS3KeyPrefix}submodules/cfn-ps-microsoft-activedirectory/"
+          VPCCIDR: !Ref "VPCCIDR"
+          VPCID: !GetAtt "VPCStack.Outputs.VPCID"
   RDGWStack:
     Condition: IncludeRDGW
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL:
         Fn::Sub:
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/templates/rdgw-domain.template.yaml'
+          - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/templates/rdgw-domain.template.yaml"
           - S3Region: !If
               - UsingDefaultBucket
               - !Ref AWS::Region
               - !Ref QSS3BucketRegion
             S3Bucket: !If
               - UsingDefaultBucket
-              - !Sub '${QSS3BucketName}-${AWS::Region}'
+              - !Sub "${QSS3BucketName}-${AWS::Region}"
               - !Ref QSS3BucketName
       Parameters:
-        DomainAdminPassword: !Ref 'DomainAdminPassword'
+        DomainAdminPassword: !Ref "DomainAdminPassword"
         DomainAdminUser: !If
           - UseAWSManagedAD
           - admin
-          - !Ref 'DomainAdminUser'
-        DomainDNSName: !Ref 'DomainDNSName'
-        DomainMemberSGID: !GetAtt 'ADStack.Outputs.DomainMemberSGID'
-        DomainNetBIOSName: !Ref 'DomainNetBIOSName'
-        KeyPairName: !Ref 'KeyPairName'
-        NumberOfRDGWHosts: !Ref 'NumberOfRDGWHosts'
-        PublicSubnet1ID: !GetAtt 'VPCStack.Outputs.PublicSubnet1ID'
-        PublicSubnet2ID: !GetAtt 'VPCStack.Outputs.PublicSubnet2ID'
-        QSS3BucketName: !Ref 'QSS3BucketName'
-        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
-        QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/'
-        RDGWInstanceType: !Ref 'RDGWInstanceType'
-        RDGWCIDR: !Ref 'RDGWCIDR'
-        VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
+          - !Ref "DomainAdminUser"
+        DomainDNSName: !Ref "DomainDNSName"
+        DomainMemberSGID: !GetAtt "ADStack.Outputs.DomainMemberSGID"
+        DomainNetBIOSName: !Ref "DomainNetBIOSName"
+        KeyPairName: !Ref "KeyPairName"
+        NumberOfRDGWHosts: !Ref "NumberOfRDGWHosts"
+        PublicSubnet1ID: !GetAtt "VPCStack.Outputs.PublicSubnet1ID"
+        PublicSubnet2ID: !GetAtt "VPCStack.Outputs.PublicSubnet2ID"
+        QSS3BucketName: !Ref "QSS3BucketName"
+        QSS3BucketRegion: !Ref "QSS3BucketRegion"
+        QSS3KeyPrefix: !Sub "${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/"
+        RDGWInstanceType: !Ref "RDGWInstanceType"
+        RDGWCIDR: !Ref "RDGWCIDR"
+        VPCID: !GetAtt "VPCStack.Outputs.VPCID"
   SIOSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL:
-        !Sub
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/sios-datakeeper.template.yaml'
-          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
-            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      TemplateURL: !Sub
+        - "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/sios-datakeeper.template.yaml"
+        - S3Region:
+            !If [UsingDefaultBucket, !Ref "AWS::Region", !Ref QSS3BucketRegion]
+          S3Bucket:
+            !If [
+              UsingDefaultBucket,
+              !Sub "${QSS3BucketName}-${AWS::Region}",
+              !Ref QSS3BucketName,
+            ]
       Parameters:
         ActiveDirectoryId: !If
           - UseAWSManagedAD
-          - !GetAtt 'ADStack.Outputs.DirectoryID'
-          - !Ref 'AWS::NoValue'
+          - !GetAtt "ADStack.Outputs.DirectoryID"
+          - !Ref "AWS::NoValue"
         ADServer1PrivateIP: !If
           - UseAWSManagedAD
-          - !GetAtt 'ADStack.Outputs.ADServer1PrivateIP'
-          - !Ref 'ADServer1PrivateIP'
+          - !GetAtt "ADStack.Outputs.ADServer1PrivateIP"
+          - !Ref "ADServer1PrivateIP"
         ADServer2PrivateIP: !If
           - UseAWSManagedAD
-          - !GetAtt 'ADStack.Outputs.ADServer2PrivateIP'
-          - !Ref 'ADServer2PrivateIP'
-        ADServer1NetBIOSName: !Ref 'ADServer1NetBIOSName'
-        ADServer2NetBIOSName: !Ref 'ADServer2NetBIOSName'
-        AMIType: !Ref 'AMIType'
-        DomainAdminPassword: !Ref 'DomainAdminPassword'
-        DomainAdminUser: !Ref 'DomainAdminUser'
-        DomainDNSName: !Ref 'DomainDNSName'
-        DomainMemberSGID: !GetAtt 'ADStack.Outputs.DomainMemberSGID'
-        DomainNetBIOSName: !Ref 'DomainNetBIOSName'
-        KeyPairName: !Ref 'KeyPairName'
-        OSVersion: !Ref 'ClusterNodeOSServerVersion'
-        SQLServerVersion: !Ref 'SQLServerVersion'
-        SQLServiceAccount: !Ref 'SQLServiceAccount'
-        SQLServiceAccountPassword: !Ref 'SQLServiceAccountPassword'
-        Volume1Iops: !Ref 'Volume1Iops'
-        Volume1Size: !Ref 'Volume1Size'
-        Volume1Type: !Ref 'Volume1Type'
-        VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
+          - !GetAtt "ADStack.Outputs.ADServer2PrivateIP"
+          - !Ref "ADServer2PrivateIP"
+        ADServer1NetBIOSName: !Ref "ADServer1NetBIOSName"
+        ADServer2NetBIOSName: !Ref "ADServer2NetBIOSName"
+        AMIType: !Ref "AMIType"
+        DomainAdminPassword: !Ref "DomainAdminPassword"
+        DomainAdminUser: !Ref "DomainAdminUser"
+        DomainDNSName: !Ref "DomainDNSName"
+        DomainMemberSGID: !GetAtt "ADStack.Outputs.DomainMemberSGID"
+        DomainNetBIOSName: !Ref "DomainNetBIOSName"
+        KeyPairName: !Ref "KeyPairName"
+        OSVersion: !Ref "ClusterNodeOSServerVersion"
+        SQLServerVersion: !Ref "SQLServerVersion"
+        SQLServiceAccount: !Ref "SQLServiceAccount"
+        SQLServiceAccountPassword: !Ref "SQLServiceAccountPassword"
+        Volume1Iops: !Ref "Volume1Iops"
+        Volume1Size: !Ref "Volume1Size"
+        Volume1Type: !Ref "Volume1Type"
+        VPCID: !GetAtt "VPCStack.Outputs.VPCID"
         VPCCIDR: !If
           - UseAWSManagedAD
-          - !Ref 'VPCCIDR'
-          - !Ref 'AWS::NoValue'
-        PrivateSubnet1CIDR: !GetAtt 'VPCStack.Outputs.PrivateSubnet1ACIDR'
-        WSFCNode1InstanceType: !Ref 'WSFCNode1InstanceType'
-        WSFCNode1NetBIOSName: !Ref 'WSFCNode1NetBIOSName'
-        WSFCNode1PrivateIP1: !Ref 'WSFCNode1PrivateIP1'
-        WSFCNode1PrivateIP2: !Ref 'WSFCNode1PrivateIP2'
-        WSFCNode1PrivateIP3: !Ref 'WSFCNode1PrivateIP3'
-        PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'
-        PrivateSubnet2CIDR: !GetAtt 'VPCStack.Outputs.PrivateSubnet2ACIDR'
-        WSFCNode2InstanceType: !Ref 'WSFCNode2InstanceType'
-        WSFCNode2NetBIOSName: !Ref 'WSFCNode2NetBIOSName'
-        WSFCNode2PrivateIP1: !Ref 'WSFCNode2PrivateIP1'
-        WSFCNode2PrivateIP2: !Ref 'WSFCNode2PrivateIP2'
-        WSFCNode2PrivateIP3: !Ref 'WSFCNode2PrivateIP3'
-        PrivateSubnet2ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet2AID'
-        ThirdAZ: !Ref 'ThirdAZ'
-        WSFCNode3InstanceType:  !If
+          - !Ref "VPCCIDR"
+          - !Ref "AWS::NoValue"
+        PrivateSubnet1CIDR: !GetAtt "VPCStack.Outputs.PrivateSubnet1ACIDR"
+        WSFCNode1InstanceType: !Ref "WSFCNode1InstanceType"
+        WSFCNode1NetBIOSName: !Ref "WSFCNode1NetBIOSName"
+        WSFCNode1PrivateIP1: !Ref "WSFCNode1PrivateIP1"
+        WSFCNode1PrivateIP2: !Ref "WSFCNode1PrivateIP2"
+        WSFCNode1PrivateIP3: !Ref "WSFCNode1PrivateIP3"
+        PrivateSubnet1ID: !GetAtt "VPCStack.Outputs.PrivateSubnet1AID"
+        PrivateSubnet2CIDR: !GetAtt "VPCStack.Outputs.PrivateSubnet2ACIDR"
+        WSFCNode2InstanceType: !Ref "WSFCNode2InstanceType"
+        WSFCNode2NetBIOSName: !Ref "WSFCNode2NetBIOSName"
+        WSFCNode2PrivateIP1: !Ref "WSFCNode2PrivateIP1"
+        WSFCNode2PrivateIP2: !Ref "WSFCNode2PrivateIP2"
+        WSFCNode2PrivateIP3: !Ref "WSFCNode2PrivateIP3"
+        PrivateSubnet2ID: !GetAtt "VPCStack.Outputs.PrivateSubnet2AID"
+        ThirdAZ: !Ref "ThirdAZ"
+        WSFCNode3InstanceType: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'WSFCNode3InstanceType'
+          - !Ref "AWS::NoValue"
+          - !Ref "WSFCNode3InstanceType"
         PrivateSubnet3CIDR: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !GetAtt 'VPCStack.Outputs.PrivateSubnet3ACIDR'
+          - !Ref "AWS::NoValue"
+          - !GetAtt "VPCStack.Outputs.PrivateSubnet3ACIDR"
         PrivateSubnet3ID: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !GetAtt 'VPCStack.Outputs.PrivateSubnet3AID'
+          - !Ref "AWS::NoValue"
+          - !GetAtt "VPCStack.Outputs.PrivateSubnet3AID"
         WSFCNode3NetBIOSName: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'WSFCNode3NetBIOSName'
+          - !Ref "AWS::NoValue"
+          - !Ref "WSFCNode3NetBIOSName"
         WSFCWitnessAmiId: !FindInMap
           - AWSLatestAMIMap
           - LATEST
           - !Ref ClusterNodeOSServerVersion
         WSFCNode3PrivateIP1: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'WSFCNode3PrivateIP1'
+          - !Ref "AWS::NoValue"
+          - !Ref "WSFCNode3PrivateIP1"
         WSFCNode3PrivateIP2: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'WSFCNode3PrivateIP2'
+          - !Ref "AWS::NoValue"
+          - !Ref "WSFCNode3PrivateIP2"
         WSFCNode3PrivateIP3: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'WSFCNode3PrivateIP3'
+          - !Ref "AWS::NoValue"
+          - !Ref "WSFCNode3PrivateIP3"
         WSFCWitnessNetBIOSName: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'WSFCWitnessNetBIOSName'
+          - !Ref "AWS::NoValue"
+          - !Ref "WSFCWitnessNetBIOSName"
         WSFCWitnessInstanceType: !If
           - IsTwoAz
-          - !Ref 'AWS::NoValue'
-          - !Ref 'WSFCWitnessInstanceType'
-        SIOSLicenseKeyFtpURL: !Ref 'SIOSLicenseKeyFtpURL'
-        QSS3BucketName: !Ref 'QSS3BucketName'
-        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
-        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+          - !Ref "AWS::NoValue"
+          - !Ref "WSFCWitnessInstanceType"
+        SIOSLicenseKeyFtpURL: !Ref "SIOSLicenseKeyFtpURL"
+        QSS3BucketName: !Ref "QSS3BucketName"
+        QSS3BucketRegion: !Ref "QSS3BucketRegion"
+        QSS3KeyPrefix: !Ref "QSS3KeyPrefix"

@@ -1,0 +1,291 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Sample Template: Windows Server 2022 EC2 instance.'
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E9101
+        - E1019
+        - W9006
+Parameters:
+  KeyName:
+    Description: 'Name of an existing EC2 KeyPair to enable SSH access to the instance.'
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: 'JakeMelli-EC2Launch-test'
+    ConstraintDescription: 'Must be the name of an existing EC2 KeyPair.'
+  SGID:
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: 'sg-009c273aca78c9346'
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Default: 'vpc-0acd96543759aef5c'
+  SubnetID:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-081b5bc0ae54e344a
+  QSS3BucketName:
+    Type: String
+    Default: 'quickstart-sios-datakeeper'
+  QSS3BucketRegion: 
+    Type: String
+    Default: 'us-east-1'
+  QSS3KeyPrefix: 
+    Type: String
+    Default: 'ec2launch/'
+  URLSuffix:
+    Type: String
+    Default: ${AWS::URLSuffix}
+Conditions:
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, "aws-ia-us-east-1"]
+Resources:
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyWildcardResource
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - !Sub "ec2.${AWS::URLSuffix}"
+                - !Sub "ssm.${AWS::URLSuffix}"
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+      Policies:
+        - PolicyName: aws-quick-start-s3-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub [
+                      "arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*",
+                      S3Bucket:
+                        !If [
+                          UsingDefaultBucket,
+                          !Sub "${QSS3BucketName}-${AWS::Region}",
+                          !Ref QSS3BucketName,
+                        ],
+                    ]
+                  - !Sub [
+                      "arn:${AWS::Partition}:s3:::${S3Bucket}",
+                      S3Bucket:
+                        !If [
+                          UsingDefaultBucket,
+                          !Sub "${QSS3BucketName}-${AWS::Region}",
+                          !Ref QSS3BucketName,
+                        ],
+                    ]
+                Effect: Allow
+              - Action:
+                  - s3:GetObject
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:s3:::aws-ssm-${AWS::Region}/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::amazon-ssm-${AWS::Region}/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::amazon-ssm-packages-${AWS::Region}/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::${AWS::Region}-birdwatcher-prod/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::patch-baseline-snapshot-${AWS::Region}/*"
+                Effect: Allow
+        - PolicyName: ssm-custom-s3-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - s3:GetObject
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:s3:::aws-ssm-${AWS::Region}/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::aws-windows-downloads-${AWS::Region}/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::amazon-ssm-${AWS::Region}/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::amazon-ssm-packages-${AWS::Region}/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::${AWS::Region}-birdwatcher-prod/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::patch-baseline-snapshot-${AWS::Region}/*"
+                Effect: Allow
+        - PolicyName: cloudformation-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:SignalResource
+                Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*"
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                Resource: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
+        - PolicyName: ssm-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: ssm:SendCommand
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:*:document/AWS-JoinDirectoryServiceDomain
+              - Effect: Allow
+                Action: ssm:SendCommand
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:*:document/AWS-RunRemoteScript
+              - Effect: Allow
+                Action: ssm:SendCommand
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:*:document/AWS-RunPowerShellScript
+              - Effect: Allow
+                Action: ssm:SendCommand
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:*:document/AWS-UpdateSSMAgent
+              - Effect: Allow
+                Action: ssm:SendCommand
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*
+              - Effect: Allow
+                Action:
+                  - ssm:DescribeInstanceInformation
+                  - ssm:ListCommandInvocations
+                  - ssm:ListCommands
+                Resource: "*"
+        - PolicyName: ec2-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeInstances
+                  - ec2:DescribeInstanceStatus
+                  - ec2:DescribeTags
+                  - fsx:DescribeFileSystems
+                  - tag:GetResources
+                Resource: "*"
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref InstanceRole
+  #Create Instance
+  WindowsServer2022Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: 'i3.large'
+      ImageId: 'ami-0ebbff1010b2fbd66'
+      IamInstanceProfile: !Ref InstanceProfile
+      EbsOptimized: true
+      KeyName: 
+        Ref: 'KeyName'
+      #SubnetId: !Ref SubnetID <-- Replace with network interface
+      NetworkInterfaces:
+        - DeviceIndex: '0'
+          SubnetId: !Ref SubnetID
+          AssociatePublicIpAddress: true
+          GroupSet:
+            - Ref: 'SGID'
+  #EC2 Volume Creation
+  AdditionalVolume:
+    Type: 'AWS::EC2::Volume'
+    Properties:
+      Size: 100
+      AvailabilityZone:
+        Fn::GetAtt:
+          - 'WindowsServer2022Instance'
+          - 'AvailabilityZone'
+      VolumeType: 'gp3'
+  #Attach EC2 Volume
+  VolumeAttachment:
+    Type: 'AWS::EC2::VolumeAttachment'
+    Properties:
+      InstanceId:
+        Ref: 'WindowsServer2022Instance'
+      VolumeId:
+        Ref: 'AdditionalVolume'
+      Device: '/dev/sdf'
+  SSMDocumentTest:
+    Type: AWS::SSM::Document
+    Properties:
+      DocumentType: Automation
+      Content:
+        schemaVersion: '0.3'
+        description: Deploy SIOS DKCE with SSM Automation
+        assumeRole: "{{AutomationAssumeRole}}"
+        mainSteps:
+          - name: updateSSMAgent
+            action: aws:runCommand
+            timeoutSeconds: 300
+            inputs:
+              DocumentName: AWS-UpdateSSMAgent
+          - name: signalsuccess
+            action: aws:executeAwsApi
+            onFailure: Abort
+            isEnd: true
+            inputs:
+              Service: cloudformation
+              Api: SignalResource
+              LogicalResourceId: !Ref MyWaitCondition
+              StackName: "${AWS::StackName}"
+              Status: SUCCESS
+              UniqueId: !Ref WindowsServer2022Instance
+          # If any steps fails signals CFN of Failure
+          - name: signalfailure
+            action: aws:executeAwsApi
+            inputs:
+              Service: cloudformation
+              Api: SignalResource
+              LogicalResourceId: !Ref MyWaitCondition
+              StackName: "${AWS::StackName}"
+              Status: FAILURE
+              UniqueId: !Ref WindowsServer2022Instance
+  MySSMAssociation:
+    Type: AWS::SSM::Association
+    Properties:
+      Name: !Ref SSMDocumentTest
+      Targets:
+        - Key: InstanceIds
+          Values:
+            - !Ref WindowsServer2022Instance
+  MyWaitConditionHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+
+  MyWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: WindowsServer2022Instance
+    Properties:
+      Handle: !Ref MyWaitConditionHandle
+      Timeout: '1200'  # Timeout in seconds
+      Count: 1
+Outputs:
+  InstanceId:
+    Description: 'Instance ID of the newly created EC2 instance'
+    Value: 
+      Ref: 'WindowsServer2022Instance'
+  PublicIP:
+    Description: 'Public IP address of the newly created EC2 instance'
+    Value: 
+      'Fn::GetAtt':
+        - 'WindowsServer2022Instance'
+        - 'PublicIp'
+
+
+
+            #       - name: InstallInitializeDisks
+            # action: aws:runCommand
+            # onFailure: step:signalfailure
+            # inputs:
+            #   DocumentName: AWS-RunRemoteScript
+            #   Parameters:
+            #     sourceType: S3
+            #     sourceInfo: !Sub
+            #       - '{"path": "https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/InitializeDisks.ps1"}'
+            #       - S3Bucket: !If
+            #           - UsingDefaultBucket
+            #           - !Sub "${QSS3BucketName}-${AWS::Region}"
+            #           - !Ref QSS3BucketName
+            #         S3Region: !If
+            #           - UsingDefaultBucket
+            #           - !Ref AWS::Region
+            #           - !Ref QSS3BucketRegion
+            #     commandline: ./initializeDisks.ps1

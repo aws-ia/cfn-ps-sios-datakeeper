@@ -233,10 +233,6 @@ Conditions:
     Fn::Equals:
       - Ref: QSS3BucketName
       - aws-ia-us-east-1
-  GovCloudCondition:
-    Fn::Equals:
-      - Ref: AWS::Region
-      - us-gov-west-1
 Resources:
   QuickStartLogs:
     Type: AWS::Logs::LogGroup

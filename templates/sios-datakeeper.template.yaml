@@ -1280,7 +1280,7 @@ Resources:
             Parameters:
               commands:
                 - |
-                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/InitializeDisks.ps1 -LocalFile C:\ProgramData\Amazon\EC2-Windows\Scripts\InitializeDisks.ps1 -Region {{QSS3BucketRegion}}
+                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/InitializeDisks.ps1 -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Region {{QSS3BucketRegion}}
         - name: InitializeDisk
           action: aws:runCommand
           onFailure: step:signalfailure

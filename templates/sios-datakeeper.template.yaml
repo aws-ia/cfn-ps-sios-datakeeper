@@ -1240,19 +1240,6 @@ Resources:
                       - !Ref AWS::Region
                       - !Ref QSS3BucketRegion
               commandLine: ./Set-Dns.ps1 -ns1 {{ADServer1PrivateIP}} -ns2 {{ADServer2PrivateIP}}
-        - name: OSVersionBranch1
-          action: aws:branch
-          inputs:
-            Choices:
-            - NextStep: CopyDriveLetterMapping
-              Variable: "{{OSVersion}}"
-              StringEquals: WS2016
-            - NextStep: CopyDriveLetterMapping
-              Variable: "{{OSVersion}}"
-              StringEquals: WS2019
-            - NextStep: ManagedADBranch2
-              Variable: "{{OSVersion}}"
-              StringEquals: WS2022
         - name: CopyDriveLetterMapping
           action: aws:runCommand
           onFailure: step:signalfailure
@@ -1267,6 +1254,33 @@ Resources:
               commands:
                 - |
                    Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/DriveLetterMappingConfig.json -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Config\DriveLetterMappingConfig.json -Region {{QSS3BucketRegion}}
+        - name: OSVersionBranch1
+          action: aws:branch
+          inputs:
+            Choices:
+            - NextStep: InitializeDisk
+              Variable: "{{OSVersion}}"
+              StringEquals: WS2016
+            - NextStep: InitializeDisk
+              Variable: "{{OSVersion}}"
+              StringEquals: WS2019
+            - NextStep: CopyInitializeDisk
+              Variable: "{{OSVersion}}"
+              StringEquals: WS2022
+        - name: CopyInitializeDisk
+          action: aws:runCommand
+          onFailure: step:signalfailure
+          inputs:
+            DocumentName: AWS-RunPowerShellScript
+            InstanceIds:
+              - '{{wsfcnodesInstanceId.InstanceIds}}'
+            CloudWatchOutputConfig:
+              CloudWatchOutputEnabled: 'true'
+              CloudWatchLogGroupName: !Ref QuickStartLogs
+            Parameters:
+              commands:
+                - |
+                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/InitializeDisks.ps1 -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Region {{QSS3BucketRegion}}
         - name: InitializeDisk
           action: aws:runCommand
           onFailure: step:signalfailure

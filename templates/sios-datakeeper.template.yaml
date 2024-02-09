@@ -1254,6 +1254,7 @@ Resources:
               commands:
                 - |
                    Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/DriveLetterMappingConfig.json -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Config\DriveLetterMappingConfig.json -Region {{QSS3BucketRegion}}
+        # START WS2022 INITIALIZE DISK BRANCH
         - name: OSVersionBranch1
           action: aws:branch
           inputs:
@@ -1281,6 +1282,18 @@ Resources:
               commands:
                 - |
                    Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/InitializeDisks.ps1 -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Region {{QSS3BucketRegion}}
+        - name: InitializeDiskScheduler
+          action: aws:runCommand
+          onFailure: step:signalfailure
+          inputs:
+            DocumentName: AWS-RunPowerShellScript
+            InstanceIds:
+              - '{{wsfcnodesInstanceId.InstanceIds}}'
+            Parameters:
+              commands:
+                - |
+                  C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Schedule
+        # END WS2022 INITIALIZE DISK BRANCH (Copy + Schedule InitializeDisks.ps1)
         - name: InitializeDisk
           action: aws:runCommand
           onFailure: step:signalfailure

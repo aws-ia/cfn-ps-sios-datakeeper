@@ -22,6 +22,15 @@
 
 
 #>
+param(
+  # Scheduling the script as task initializes all disks at startup.
+  # If this argument is not provided, script is executed immediately.
+  [Parameter(Mandatory = $false)]
+  [switch]$Schedule = $false,
+
+  [Parameter(Mandatory = $false)]
+  [switch]$EnableTrim
+)
 
 function Complete-Log
 {
@@ -30,6 +39,92 @@ function Complete-Log
     $script:logSettingStack.pop() | Out-Null
   }
 }
+
+function Register-PowershellScheduler
+{
+  param(
+    [Parameter(Mandatory = $true,Position = 0)]
+    [string]$Command,
+
+    [Parameter(Mandatory = $true,Position = 1)]
+    [string]$ScheduleName,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Unregister = $false,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Disabled = $false
+  )
+
+  $taskName = ("Amazon Ec2 Launch - {0}" -f $ScheduleName)
+
+  if ($Unregister)
+  {
+    $scheduledTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+    if ($scheduledTask)
+    {
+      Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+    }
+  }
+  else
+  {
+    # Scheduled task is triggered at start up to execute script as local system with highest priority.
+    # The task is disabled by default if Disabled argument is provided.
+    $action = New-ScheduledTaskAction -Execute $script:cmdPath -Argument $Command
+    $trigger = New-ScheduledTaskTrigger -AtStartup
+    $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -DisallowHardTerminate -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -Priority 0
+    $settings.Enabled = (-not $Disabled)
+    $principal = New-ScheduledTaskPrincipal -UserId S-1-5-18 -LogonType ServiceAccount -RunLevel Highest
+    $task = New-ScheduledTask -Action $action -Trigger $trigger -Settings $settings -Principal $principal
+    Register-ScheduledTask -TaskName $taskName -InputObject $task -Force
+  }
+}
+
+
+function Register-ScriptScheduler
+{
+  param(
+    # this argument must be provided to check and set serial port before starting tasks
+    [Parameter(Mandatory = $true,Position = 0)]
+    [string]$ScriptPath,
+
+    [Parameter(Mandatory = $false,Position = 1)]
+    [string]$Arguments,
+
+    [Parameter(Mandatory = $true,Position = 2)]
+    [string]$ScheduleName,
+
+    # This argument ensures the task to be unregistered.
+    [Parameter(Mandatory = $false)]
+    [switch]$Unregister = $false,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Disabled = $false
+  )
+
+  try
+  {
+    # Script must be exeucted with -NoProfile to reduce the execution delay and -ExecutionPolicy Unrestricted to grant the permission.
+    $psCommand = "/C {0} -NoProfile -NonInteractive -NoLogo -ExecutionPolicy Unrestricted -File `"{1}`" {2}" -f $script:psPath,$ScriptPath,$Arguments
+    if ($Unregister)
+    {
+      Register-PowershellScheduler -ScheduleName $ScheduleName -Command $psCommand -Unregister
+    }
+    elseif ($Disabled)
+    {
+      Register-PowershellScheduler -ScheduleName $ScheduleName -Command $psCommand -Disabled
+    }
+    else
+    {
+      Register-PowershellScheduler -ScheduleName $ScheduleName -Command $psCommand
+    }
+  }
+  catch
+  {
+    Write-ErrorLog ("Failed to schedule a task: {0}" -f $_.Exception.Message)
+  }
+}
+
 
 function Set-Trim
 {
@@ -554,7 +649,23 @@ Set-Variable shellHwRegPath -Option Constant -Scope Local -Value "HKLM:\SYSTEM\C
 
 
 # Before calling any function, initialize the log with filename
-Initialize-Log -FileName "DiskInitialization.log"
+Initialize-Log -FileName "DiskInitialization.log" -RestrictToAdmins $false
+
+if ($Schedule)
+{
+  # Scheduling script with no argument tells script to start normally.
+  if ($EnableTrim)
+  {
+    Register-ScriptScheduler -ScriptPath $scriptPath -ScheduleName $scheduleName -Arguments "-EnableTrim"
+  }
+  else
+  {
+    Register-ScriptScheduler -ScriptPath $scriptPath -ScheduleName $scheduleName
+  }
+  Write-Log "Disk initialization is scheduled successfully"
+  Complete-Log
+  exit 0
+}
 
 try
 {
@@ -562,12 +673,12 @@ try
 
   # Set TRIM using settings value from userdata.
   # By default, TRIM is disabled before formatting disk.
-  $wasTrimEnabled = Set-Trim -Enable 0 #Manually set to false
+  $wasTrimEnabled = Set-Trim -Enable $EnableTrim
 
   # This count is used to label ephemeral disks.
   $ephemeralCount = 0
 
-  $allSucceeded = $True
+  $allSucceeded = $true
 
   # Retrieve and initialize each disk drive.
   foreach ($disk in (Get-CimInstance -ClassName Win32_DiskDrive))
@@ -591,7 +702,7 @@ try
     }
 
     # Find out if the disk is whether ephemeral or not.
-    $isEphemeral = $False
+    $isEphemeral = $false
     $isEphemeral = Test-EphemeralDisk -DiskIndex $disk.Index -DiskSCSITargetId $disk.SCSITargetId
 
     # Finally, set the disk and get drive letter for result.
@@ -610,7 +721,7 @@ try
     else
     {
       # If any disk failed to be initilaized, exitcode needs to be 1.
-      $allSucceeded = $False
+      $allSucceeded = $false
     }
   }
 

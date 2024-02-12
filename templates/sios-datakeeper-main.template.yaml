@@ -281,7 +281,7 @@ Parameters:
     Type: List<AWS::EC2::AvailabilityZone::Name>
   ClusterNodeOSServerVersion:
     AllowedValues:
-      - WS2012R2
+      - WS2022
       - WS2016
       - WS2019
     Default: WS2019
@@ -695,9 +695,9 @@ Parameters:
 Mappings:
   AWSLatestAMIMap:
     LATEST:
-      WS2012R2: /aws/service/ami-windows-latest/Windows_Server-2012-R2_RTM-English-64Bit-Base
       WS2016: /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
       WS2019: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+      WS2022: /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
 Conditions:
   IsTwoAz: !Equals [!Ref ThirdAZ, none]
   UseAWSDirectoryServiceEE: !Equals
@@ -755,7 +755,7 @@ Resources:
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}${QSADTemplate}
         - QSADTemplate: !If
             - UseAWSManagedAD
-            - submodules/cfn-ps-microsoft-activedirectory/templates/ad-3.template
+            - submodules/cfn-ps-microsoft-activedirectory/templates/ad-3.template.yaml
             - templates/ad.template.yaml
           S3Region: !If
             - UsingDefaultBucket
@@ -807,7 +807,7 @@ Resources:
     Properties:
       TemplateURL:
         Fn::Sub:
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/templates/rdgw-domain.template'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/cfn-ps-microsoft-rdgateway/templates/rdgw-domain.template.yaml'
           - S3Region: !If
               - UsingDefaultBucket
               - !Ref AWS::Region

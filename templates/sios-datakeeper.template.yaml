@@ -38,16 +38,16 @@ Metadata:
         owner-alias: aws-marketplace
         product-code.type: marketplace
         product-code: 959g9sxo7jo9axg7au8fjxvmi
-      SDKCEWIN2012R2:
-        name: SIOS DataKeeper v8* on 2012R2*
+      SDKCEWIN2022:
+        name: SIOS DataKeeper v8* on 2022*
         owner-alias: aws-marketplace
         product-code.type: marketplace
-        product-code: dvw0k1cslwup93kxyf85trjxm
-      SDKCEWIN2012R2BYOL:
-        name: SIOS DataKeeper v8* on 2012R2 BYOL*
+        product-code: dgaggj9xjz7lxfto3aih26aa4
+      SDKCEWIN2022BYOL:
+        name: SIOS DataKeeper v8* on 2022 BYOL*
         owner-alias: aws-marketplace
         product-code.type: marketplace
-        product-code: 14oj75sfcidvzwqizi8lzs7c2
+        product-code: dw2ar1dpog8lorldwt78qlt1s
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -304,7 +304,7 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
   OSVersion:
     AllowedValues:
-      - WS2012R2
+      - WS2022
       - WS2016
       - WS2019
     Default: WS2019
@@ -436,9 +436,9 @@ Parameters:
     Default: '/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base'
     Description: AMI ID for a WSFC file-share-witness node.
     AllowedValues:
-    - /aws/service/ami-windows-latest/Windows_Server-2012-R2_RTM-English-64Bit-Base
     - /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
     - /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+    - /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
   WSFCNode1InstanceType:
     AllowedValues:
       - m3.xlarge
@@ -672,125 +672,125 @@ Rules:
         AssertDescription: All subnets must be in the VPC
 Mappings:
   BYOLNameMap:
-    WS2012R2:
-      Code: SDKCEWIN2012R2BYOL
+    WS2022:
+      Code: SDKCEWIN2022BYOL
     WS2016:
       Code: SDKCEWIN2016BYOL
     WS2019:
       Code: SDKCEWIN2019BYOL
   PAYGNameMap:
-    WS2012R2:
-      Code: SDKCEWIN2012R2
+    WS2022:
+      Code: SDKCEWIN2022
     WS2016:
       Code: SDKCEWIN2016
     WS2019:
       Code: SDKCEWIN2019
   AWSAMIRegionMap:
     ap-northeast-2:
-      SDKCEWIN2012R2: ami-027b185d10edaf8ad
-      SDKCEWIN2012R2BYOL: ami-0fc0966a6e2caf61b
-      SDKCEWIN2016: ami-02d2dab7f9a5180ab
-      SDKCEWIN2016BYOL: ami-0c3f7f46d80fdd669
-      SDKCEWIN2019: ami-062faaa8d357fb89b
-      SDKCEWIN2019BYOL: ami-005f66ba7d9aad148
+      SDKCEWIN2016: ami-0054976f191097a9a
+      SDKCEWIN2016BYOL: ami-089745f6e1e1d63dc
+      SDKCEWIN2019: ami-07cf03789eac915a5
+      SDKCEWIN2019BYOL: ami-0ce6bdba37a44b0ee
+      SDKCEWIN2022: ami-0d2b13c1321d489d0
+      SDKCEWIN2022BYOL: ami-0528ab45cefc5e20a
     ap-south-1:
-      SDKCEWIN2012R2: ami-0e210ad2e1cb206ef
-      SDKCEWIN2012R2BYOL: ami-0314854fe2675f37b
-      SDKCEWIN2016: ami-04da3fa852fb8c796
-      SDKCEWIN2016BYOL: ami-03febf94482787911
-      SDKCEWIN2019: ami-0905692e934e978a6
-      SDKCEWIN2019BYOL: ami-02fa941baca2f8332
+      SDKCEWIN2016: ami-0e3183964d783bed0
+      SDKCEWIN2016BYOL: ami-0380330f856d6acdd
+      SDKCEWIN2019: ami-0a253c09c19b7258f
+      SDKCEWIN2019BYOL: ami-0e9176b12c065f2ad
+      SDKCEWIN2022: ami-0be735b382ab23df1
+      SDKCEWIN2022BYOL: ami-09a135b4b0104cc75
     ap-southeast-1:
-      SDKCEWIN2012R2: ami-0797051282f601f2d
-      SDKCEWIN2012R2BYOL: ami-008dafcb7df5fc6f7
-      SDKCEWIN2016: ami-0f1748005d3242ddc
-      SDKCEWIN2016BYOL: ami-0545802d9d2d095dc
-      SDKCEWIN2019: ami-0663b265ba328e941
-      SDKCEWIN2019BYOL: ami-0495f526cbd94c5d7
+      SDKCEWIN2016: ami-0336dd3e7c2c5fd74
+      SDKCEWIN2016BYOL: ami-0cc3c29eb508e7ebe
+      SDKCEWIN2019: ami-0bf4ae5fd6dea7f69
+      SDKCEWIN2019BYOL: ami-09b5d28488fd72e1e
+      SDKCEWIN2022: ami-0ccc6e048aff0963f
+      SDKCEWIN2022BYOL: ami-0155d634b38173d5c
     ap-southeast-2:
-      SDKCEWIN2012R2: ami-08d076f5af13f393c
-      SDKCEWIN2012R2BYOL: ami-028c952435f6b353e
-      SDKCEWIN2016: ami-0649761bc7208ffce
-      SDKCEWIN2016BYOL: ami-0a15d4ce3da2781e6
-      SDKCEWIN2019: ami-054b6323b341b5ba3
-      SDKCEWIN2019BYOL: ami-019d68463c6dbe040
+      SDKCEWIN2016: ami-082aac685dfe8c4ee
+      SDKCEWIN2016BYOL: ami-0de2a33ef853daf21
+      SDKCEWIN2019: ami-0496f2cbd8e226a6c
+      SDKCEWIN2019BYOL: ami-017325eea59d2b0ca
+      SDKCEWIN2022: ami-0d4782247c5349276
+      SDKCEWIN2022BYOL: ami-0ec43a9c868d8a453
     ca-central-1:
-      SDKCEWIN2012R2: ami-0b2fff802a442eea4
-      SDKCEWIN2012R2BYOL: ami-06b59737d361ac0ce
-      SDKCEWIN2016: ami-0efd02f9f772ade84
-      SDKCEWIN2016BYOL: ami-06ec062a3b36e745a
-      SDKCEWIN2019: ami-0a11c5a8ea485315a
-      SDKCEWIN2019BYOL: ami-0933bd0b44f1bcdf3
+      SDKCEWIN2016: ami-0dd562758af2ccb59
+      SDKCEWIN2016BYOL: ami-0ba4c9ce146a94aec
+      SDKCEWIN2019: ami-03e76bb82d32dcf81
+      SDKCEWIN2019BYOL: ami-001e5bf6d03de960a
+      SDKCEWIN2022: ami-0eb7c20bb3ae02d19
+      SDKCEWIN2022BYOL: ami-04ee56482b95a383d
     eu-central-1:
-      SDKCEWIN2012R2: ami-033d5b83c36ce921a
-      SDKCEWIN2012R2BYOL: ami-08aebb2ce57278edc
-      SDKCEWIN2016: ami-09618ff63efa23ade
-      SDKCEWIN2016BYOL: ami-06769da912ea34f33
-      SDKCEWIN2019: ami-08b4ef188e047a0e5
-      SDKCEWIN2019BYOL: ami-0b8b84ea5a0788d5d
+      SDKCEWIN2016: ami-09ab5f5e4629a0666
+      SDKCEWIN2016BYOL: ami-0c8ccbe5bb57356e5
+      SDKCEWIN2019: ami-06c9dc07cde263632
+      SDKCEWIN2019BYOL: ami-0d3a7cb465ac6c216
+      SDKCEWIN2022: ami-01d42e3a5787592a1
+      SDKCEWIN2022BYOL: ami-092edb5d5ecf4e655
     eu-north-1:
-      SDKCEWIN2012R2: ami-075609becea2619bd
-      SDKCEWIN2012R2BYOL: ami-08beebe0f394beced
-      SDKCEWIN2016: ami-02b89b9d7bee75b7d
-      SDKCEWIN2016BYOL: ami-0c864cc7aea09b62c
-      SDKCEWIN2019: ami-042e65be3fbdb0653
-      SDKCEWIN2019BYOL: ami-0ffdf69fabfbe8f93
+      SDKCEWIN2016: ami-079c1879e6e42d4f9
+      SDKCEWIN2016BYOL: ami-0da3f0838cdcf7683
+      SDKCEWIN2019: ami-04a08e028eb5fa30b
+      SDKCEWIN2019BYOL: ami-0c188147e53408f9a
+      SDKCEWIN2022: ami-0d8101522c79dcf67
+      SDKCEWIN2022BYOL: ami-076ad2d192f576d71
     eu-west-1:
-      SDKCEWIN2012R2: ami-0a84e777b9c75427a
-      SDKCEWIN2012R2BYOL: ami-00b0917c0ef507bea
-      SDKCEWIN2016: ami-0bbd40b3c6b951b18
-      SDKCEWIN2016BYOL: ami-02342d1141eb71b74
-      SDKCEWIN2019: ami-039c7661a8e9f2047
-      SDKCEWIN2019BYOL: ami-0ec41b10cc17e1f52
+      SDKCEWIN2016: ami-02697a405288866f6
+      SDKCEWIN2016BYOL: ami-067d826452225bcb9
+      SDKCEWIN2019: ami-06c51f8869741c998
+      SDKCEWIN2019BYOL: ami-0eee7c28c43322105
+      SDKCEWIN2022: ami-077ccd66533ddf1d0
+      SDKCEWIN2022BYOL: ami-08d512a002d5e18c5
     eu-west-2:
-      SDKCEWIN2012R2: ami-03b79f079f8a3e42b
-      SDKCEWIN2012R2BYOL: ami-01299dfa29faba39f
-      SDKCEWIN2016: ami-0b79c4a44813c25b8
-      SDKCEWIN2016BYOL: ami-070778610eddacc86
-      SDKCEWIN2019: ami-03f1b821be3258a17
-      SDKCEWIN2019BYOL: ami-0d3ff5b4e0cbf652b
+      SDKCEWIN2016: ami-073c2ec1342397f2c
+      SDKCEWIN2016BYOL: ami-095202258867f2643
+      SDKCEWIN2019: ami-031db17c7ed6fb28c
+      SDKCEWIN2019BYOL: ami-028d4141d377570b2
+      SDKCEWIN2022: ami-0f5baf36d6d256a99
+      SDKCEWIN2022BYOL: ami-017acd9999f3f20b0
     eu-west-3:
-      SDKCEWIN2012R2: ami-04374760335727a0d
-      SDKCEWIN2012R2BYOL: ami-08f3bae91951eb7d3
-      SDKCEWIN2016: ami-07852496d3aae0e6a
-      SDKCEWIN2016BYOL: ami-039219ac52dcc7679
-      SDKCEWIN2019: ami-059546eaf9d88af40
-      SDKCEWIN2019BYOL: ami-0281c51ecfb36e2da
+      SDKCEWIN2016: ami-0cb0c41e2fee51d44
+      SDKCEWIN2016BYOL: ami-01f9afede44304594
+      SDKCEWIN2019: ami-07c0f0a0e53c98417
+      SDKCEWIN2019BYOL: ami-02280f36bffd0b002
+      SDKCEWIN2022: ami-0fe431396481001a5
+      SDKCEWIN2022BYOL: ami-0e4848b1417f9b8e3
     sa-east-1:
-      SDKCEWIN2012R2: ami-06a20d58f2f7f4439
-      SDKCEWIN2012R2BYOL: ami-03d2446bc24105e75
-      SDKCEWIN2016: ami-0f502dfc7fb6127eb
-      SDKCEWIN2016BYOL: ami-073e59c8d7d66cf11
-      SDKCEWIN2019: ami-0f7da045733e2438e
-      SDKCEWIN2019BYOL: ami-0defa8e6e2084c38d
+      SDKCEWIN2016: ami-037afd3ec6824bc49
+      SDKCEWIN2016BYOL: ami-0469741ba38d48357
+      SDKCEWIN2019: ami-05704c8fa834af7f7
+      SDKCEWIN2019BYOL: ami-08e3f6cce448bdcc5
+      SDKCEWIN2022: ami-0767b10a3c83ddaab
+      SDKCEWIN2022BYOL: ami-0a005147cb4033adf
     us-east-1:
-      SDKCEWIN2012R2: ami-0edadd10f56b4affd
-      SDKCEWIN2012R2BYOL: ami-0cb50e0e67c11bde1
-      SDKCEWIN2016: ami-0d9d5e0dfc80debfb
-      SDKCEWIN2016BYOL: ami-0e051ecae19934ecf
-      SDKCEWIN2019: ami-05ab9fcfd76cefdaa
-      SDKCEWIN2019BYOL: ami-084b3815edb07da23
+      SDKCEWIN2016: ami-0a9aa18f81efbb101
+      SDKCEWIN2016BYOL: ami-009014104954f4179
+      SDKCEWIN2019: ami-00a3596f4d1ce983b
+      SDKCEWIN2019BYOL: ami-08e0bea89cdaed605
+      SDKCEWIN2022: ami-0fc0fde68c4eb4309
+      SDKCEWIN2022BYOL: ami-0bb4e13f7412059ad
     us-east-2:
-      SDKCEWIN2012R2: ami-0392d26b6ced314e1
-      SDKCEWIN2012R2BYOL: ami-00c0dddbd2fccdbc6
-      SDKCEWIN2016: ami-00982f1449d2fb93b
-      SDKCEWIN2016BYOL: ami-0d77aaf34b42dc68f
-      SDKCEWIN2019: ami-037e166788e840fca
-      SDKCEWIN2019BYOL: ami-0a3d0e1d8ca57c345
+      SDKCEWIN2016: ami-09d1452e7898e7671
+      SDKCEWIN2016BYOL: ami-0ce8fa5b3c02e4327
+      SDKCEWIN2019: ami-0b4239caea2edef96
+      SDKCEWIN2019BYOL: ami-0484b17ea0f4c10cc
+      SDKCEWIN2022: ami-00d6f833f319e5dc4
+      SDKCEWIN2022BYOL: ami-01098a6bd7f68c95c
     us-west-1:
-      SDKCEWIN2012R2: ami-00fd9d875eb525a36
-      SDKCEWIN2012R2BYOL: ami-0a58fd616052c5779
-      SDKCEWIN2016: ami-011e13c774550e28b
-      SDKCEWIN2016BYOL: ami-024a97094d171a3e4
-      SDKCEWIN2019: ami-07714a7814057c37e
-      SDKCEWIN2019BYOL: ami-0618a8a99ed3e31ff
+      SDKCEWIN2016: ami-05b267c8620db8e2c
+      SDKCEWIN2016BYOL: ami-0ae82fe522ac7567f
+      SDKCEWIN2019: ami-0f4a3540b60e94161
+      SDKCEWIN2019BYOL: ami-01c7309b2c3779929
+      SDKCEWIN2022: ami-0101aad44e0bf453b
+      SDKCEWIN2022BYOL: ami-0f5c12e5456f4c881
     us-west-2:
-      SDKCEWIN2012R2: ami-062d43d7a7f92e1e5
-      SDKCEWIN2012R2BYOL: ami-0c572a4f852d72883
-      SDKCEWIN2016: ami-0de47666d948bb685
-      SDKCEWIN2016BYOL: ami-061ab77e7df0a41d0
-      SDKCEWIN2019: ami-050f24416877f7ec6
-      SDKCEWIN2019BYOL: ami-096206a1274ee7727
+      SDKCEWIN2016: ami-01102b22611f7c29b
+      SDKCEWIN2016BYOL: ami-0525fb8a96e39f3a1
+      SDKCEWIN2019: ami-07080a4acfe7320ba
+      SDKCEWIN2019BYOL: ami-0209807f66af0b10c
+      SDKCEWIN2022: ami-0707ec3c060d380a0
+      SDKCEWIN2022BYOL: ami-0a93254a73f3606bc
 Resources:
   QuickStartLogs:
     Type: AWS::Logs::LogGroup
@@ -866,7 +866,7 @@ Resources:
            description: Windows Remote PowerShell DNS name for Amazon FSx file share used with AWS Managed Microsoft AD deployment.
            type: String
           OSVersion:
-           default: WS2012R2
+           default: WS2019
            description: Version of the Windows Server OS to use for cluster nodes.
            type: String
           PrivateSubnet1CIDR:
@@ -1122,13 +1122,6 @@ Resources:
                 - |
                   New-Item -Type Directory C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart
                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/modules/AWSQuickStart/AWSQuickStart.psm1 -LocalFile C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart\AWSQuickStart.psm1 -Region {{QSS3BucketRegion}}
-        - name: OSVersionBranch1
-          action: aws:branch
-          inputs:
-            Choices:
-            - NextStep: 2012R2InstallWMF51
-              Variable: "{{OSVersion}}"
-              StringEquals: WS2012R2
         - name: InstallDSCModules
           action: aws:runCommand
           nextStep: LCMConfig
@@ -1154,94 +1147,6 @@ Resources:
                       - !Ref AWS::Region
                       - !Ref QSS3BucketRegion
               commandLine: ./install-dsc-modules.ps1
-        # START WS2012R2 OSVersion branch1
-        - name: 2012R2InstallWMF51
-          action: aws:runCommand
-          onFailure: step:signalfailure
-          inputs:
-            DocumentName: AWS-RunRemoteScript
-            InstanceIds:
-              - '{{wsfcnodesInstanceId.InstanceIds}}'
-            CloudWatchOutputConfig:
-              CloudWatchOutputEnabled: 'true'
-              CloudWatchLogGroupName: !Ref QuickStartLogs
-            Parameters:
-              sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/Install-WMF51.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
-              commandLine:
-              - |
-                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-                ./Install-WMF51.ps1
-        - name: 2012R2InstallDSC
-          action: aws:runCommand
-          onFailure: step:signalfailure
-          inputs:
-            DocumentName: AWS-RunPowerShellScript
-            InstanceIds:
-              - '{{wsfcnodesInstanceId.InstanceIds}}'
-            CloudWatchOutputConfig:
-              CloudWatchOutputEnabled: 'true'
-              CloudWatchLogGroupName: !Ref QuickStartLogs
-            Parameters:
-              commands:
-                - |
-                   Install-WindowsFeature -Name DSC-Service
-                   Set-Item -Path WSMan:\localhost\MaxEnvelopeSizeKb -Value 2048
-                   Set-WSManQuickConfig -Force
-                   $PSVersion = $PSVersionTable.PSVersion.Major
-                   if ($PSVersion -eq '4') {
-                     'returning 3010, should continue after reboot'
-                      exit 3010
-                   } else {'Next Step'}
-        - name: CopyNewCertificateScript
-          action: aws:runCommand
-          onFailure: step:signalfailure
-          inputs:
-            DocumentName: AWS-RunPowerShellScript
-            InstanceIds:
-              - '{{wsfcnodesInstanceId.InstanceIds}}'
-            CloudWatchOutputConfig:
-              CloudWatchOutputEnabled: 'true'
-              CloudWatchLogGroupName: !Ref QuickStartLogs
-            Parameters:
-              commands:
-                - |
-                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/New-SelfSignedCertificateEx.ps1 -LocalFile C:\cfn\scripts\New-SelfSignedCertificateEx.ps1 -Region {{QSS3BucketRegion}}
-        - name: InstallDSCModules2012R2
-          action: aws:runCommand
-          onFailure: step:signalfailure
-          inputs:
-            DocumentName: AWS-RunRemoteScript
-            InstanceIds:
-              - '{{wsfcnodesInstanceId.InstanceIds}}'
-            CloudWatchOutputConfig:
-              CloudWatchOutputEnabled: 'true'
-              CloudWatchLogGroupName: !Ref QuickStartLogs
-            Parameters:
-              sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/install-dsc-modules.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
-              commandLine: ./install-dsc-modules.ps1 -WS2012R2
-        # END WS2012R2 OSVersion branch1
         - name: LCMConfig
           action: aws:runCommand
           onFailure: step:signalfailure
@@ -1335,19 +1240,6 @@ Resources:
                       - !Ref AWS::Region
                       - !Ref QSS3BucketRegion
               commandLine: ./Set-Dns.ps1 -ns1 {{ADServer1PrivateIP}} -ns2 {{ADServer2PrivateIP}}
-        - name: OSVersionBranch2
-          action: aws:branch
-          inputs:
-            Choices:
-            - NextStep: CopyDriveLetterMapping
-              Variable: "{{OSVersion}}"
-              StringEquals: WS2016
-            - NextStep: CopyDriveLetterMapping
-              Variable: "{{OSVersion}}"
-              StringEquals: WS2019
-            - NextStep: ManagedADBranch2
-              Variable: "{{OSVersion}}"
-              StringEquals: WS2012R2
         - name: CopyDriveLetterMapping
           action: aws:runCommand
           onFailure: step:signalfailure
@@ -1362,6 +1254,46 @@ Resources:
               commands:
                 - |
                    Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/DriveLetterMappingConfig.json -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Config\DriveLetterMappingConfig.json -Region {{QSS3BucketRegion}}
+        # START WS2022 INITIALIZE DISK BRANCH
+        - name: OSVersionBranch1
+          action: aws:branch
+          inputs:
+            Choices:
+            - NextStep: InitializeDisk
+              Variable: "{{OSVersion}}"
+              StringEquals: WS2016
+            - NextStep: InitializeDisk
+              Variable: "{{OSVersion}}"
+              StringEquals: WS2019
+            - NextStep: CopyInitializeDisk
+              Variable: "{{OSVersion}}"
+              StringEquals: WS2022
+        - name: CopyInitializeDisk
+          action: aws:runCommand
+          onFailure: step:signalfailure
+          inputs:
+            DocumentName: AWS-RunPowerShellScript
+            InstanceIds:
+              - '{{wsfcnodesInstanceId.InstanceIds}}'
+            CloudWatchOutputConfig:
+              CloudWatchOutputEnabled: 'true'
+              CloudWatchLogGroupName: !Ref QuickStartLogs
+            Parameters:
+              commands:
+                - |
+                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/InitializeDisks.ps1 -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Region {{QSS3BucketRegion}}
+        - name: InitializeDiskScheduler
+          action: aws:runCommand
+          onFailure: step:signalfailure
+          inputs:
+            DocumentName: AWS-RunPowerShellScript
+            InstanceIds:
+              - '{{wsfcnodesInstanceId.InstanceIds}}'
+            Parameters:
+              commands:
+                - |
+                  C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Schedule
+        # END WS2022 INITIALIZE DISK BRANCH (Copy + Schedule InitializeDisks.ps1)
         - name: InitializeDisk
           action: aws:runCommand
           onFailure: step:signalfailure

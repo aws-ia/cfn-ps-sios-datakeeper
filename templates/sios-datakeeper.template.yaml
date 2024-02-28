@@ -1024,6 +1024,24 @@ Resources:
           - Name: InstanceId
             Selector: $.Reservations[0].Instances[0].InstanceId
             Type: String
+        - name: updateS3BucketName
+          action: aws:updateVariable
+          inputs:
+            Name: 'S3BucketName'
+            Value: 
+              - !If
+                - UsingDefaultBucket  # is this an AWS template? 
+                - !Sub '${QSS3BucketName}-${AWS::Region}' #true
+                - !Ref QSS3BucketName #false
+        - name: updateS3Region
+          action: aws:updateVariable
+          inputs:
+            Name: 'S3Region'
+            Value: 
+              - !If
+                - UsingDefaultBucket  # is this an AWS template? 
+                - !Sub AWS::Region #true
+                - !Ref QSS3BucketRegion #false
         # Skip finding node 3 instance id if managed ad or no third zone
         - name: InstanceIdBranch
           action: aws:branch
@@ -1121,7 +1139,7 @@ Resources:
               commands:
                 - |
                   New-Item -Type Directory C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart
-                  Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/modules/AWSQuickStart/AWSQuickStart.psm1 -LocalFile C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart\AWSQuickStart.psm1 -Region {{QSS3BucketRegion}}
+                  Copy-S3Object -Bucket {{S3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/modules/AWSQuickStart/AWSQuickStart.psm1 -LocalFile C:\Windows\system32\WindowsPowerShell\v1.0\Modules\AWSQuickStart\AWSQuickStart.psm1 -Region {{S3Region}}
         - name: InstallDSCModules
           action: aws:runCommand
           nextStep: LCMConfig
@@ -1135,17 +1153,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/install-dsc-modules.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/install-dsc-modules.ps1"}'
               commandLine: ./install-dsc-modules.ps1
         - name: LCMConfig
           action: aws:runCommand
@@ -1159,17 +1167,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/LCM-Config.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/LCM-Config.ps1"}'
               commandLine: ./LCM-Config.ps1
         - name: EnableCredSSP
           action: aws:runCommand
@@ -1183,7 +1181,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               commands:
-                - Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/EnableCredSsp.ps1 -LocalFile C:\cfn\scripts\EnableCredSsp.ps1 -Region {{QSS3BucketRegion}}
+                - 'Copy-S3Object -Bucket {{S3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/EnableCredSsp.ps1 -LocalFile C:\cfn\scripts\EnableCredSsp.ps1 -Region {{S3Region}}'
         - name: EnableCredSSPReboot
           action: aws:runCommand
           onFailure: step:signalfailure
@@ -1228,17 +1226,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/Set-Dns.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/Set-Dns.ps1"}'
               commandLine: ./Set-Dns.ps1 -ns1 {{ADServer1PrivateIP}} -ns2 {{ADServer2PrivateIP}}
         - name: CopyDriveLetterMapping
           action: aws:runCommand
@@ -1252,8 +1240,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               commands:
-                - |
-                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/DriveLetterMappingConfig.json -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Config\DriveLetterMappingConfig.json -Region {{QSS3BucketRegion}}
+                - 'Copy-S3Object -Bucket {{S3BucketName}} -key {{QSS3KeyPrefix}}scripts/DriveLetterMappingConfig.json -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Config\DriveLetterMappingConfig.json -Region {{S3Region}}' 
         # START WS2022 INITIALIZE DISK BRANCH
         - name: OSVersionBranch1
           action: aws:branch
@@ -1280,8 +1267,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               commands:
-                - |
-                   Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}scripts/InitializeDisks.ps1 -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Region {{QSS3BucketRegion}}
+                - 'Copy-S3Object -Bucket {{S3BucketName}} -key {{QSS3KeyPrefix}}scripts/InitializeDisks.ps1 -LocalFile C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeDisks.ps1 -Region {{S3Region}}'
         - name: InitializeDiskScheduler
           action: aws:runCommand
           onFailure: step:signalfailure
@@ -1342,17 +1328,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/DomainJoin.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/DomainJoin.ps1"}'
               commandLine: ./DomainJoin.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -DomainDNSName {{DomainDNSName}} -AdminSecret {{AdminSecrets}}
         - name: DomainJoinApply
           action: aws:runCommand
@@ -1388,17 +1364,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/OpenWSFCPorts.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/OpenWSFCPorts.ps1"}'
               commandLine: ./OpenWSFCPorts.ps1
         - name: ByolAmiBranch
           action: aws:branch
@@ -1419,17 +1385,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/DownloadDKCELicense.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/DownloadDKCELicense.ps1"}'
               commandLine: ./DownloadDKCELicense.ps1 -SIOSLicenseKeyFtpURL "{{SIOSLicenseKeyFtpURL}}"
         - name: CreateJob
           action: aws:runCommand
@@ -1443,17 +1399,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/CreateJob.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/CreateJob.ps1"}'
               commandLine: !If
                 - ThirdAzIsFullNode
                 - ./CreateJob.ps1 -JobName "vol.D" -JobDesc "DKCE Volume Protection" -SourceNames "{{WSFCNode1NetBIOSName}}.{{DomainDNSName}}","{{WSFCNode2NetBIOSName}}.{{DomainDNSName}}" -SourceVols "D","D" -SourceIPs "{{WSFCNode1PrivateIP1}}","{{WSFCNode2PrivateIP1}}" -TargetNames "{{WSFCNode2NetBIOSName}}.{{DomainDNSName}}","{{WSFCNode3NetBIOSName}}.{{DomainDNSName}}" -TargetIPs "{{WSFCNode2PrivateIP1}}","{{WSFCNode3PrivateIP1}}" -TargetVols "D","D" -SyncTypes "S","S","S"
@@ -1470,17 +1416,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/CreateMirror.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/CreateMirror.ps1"}'
               commandLine: !If
                 - ThirdAzIsFullNode
                 - ./CreateMirror.ps1 -SourceIP "{{WSFCNode1PrivateIP1}}" -Volume "D" -TargetIPs "{{WSFCNode2PrivateIP1}}","{{WSFCNode3PrivateIP1}}" -SyncTypes "S","S"
@@ -1533,17 +1469,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/install-fsw-modules.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/install-fsw-modules.ps1"}'
               commandLine: ./install-fsw-modules.ps1
         - name: WitnessCreateFileShare3AZ
           action: aws:runCommand
@@ -1557,17 +1483,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WSFCFileShare.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WSFCFileShare.ps1"}'
               commandLine: ./WSFCFileShare.ps1
         - name: InvokeADReplicationDC1
           action: aws:runCommand
@@ -1626,17 +1542,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Node1Config.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Node1Config.ps1"}'
               commandLine: ./Node1Config.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -DomainDNSName {{DomainDNSName}} -WSFCNode1PrivateIP2 {{WSFCNode1PrivateIP2}} -ClusterName {{ClusterName}} -AdminSecret {{AdminSecrets}} -SQLSecret {{SQLSecrets}}
         - name: ApplyWSFCNode1Config
           action: aws:runCommand
@@ -1681,17 +1587,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Set-Folder-Permissions.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Set-Folder-Permissions.ps1"}'
               commandLine:
                 !Sub
                   - ./Set-Folder-Permissions.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -AdminSecret {{AdminSecrets}} -SQLSecret {{SQLSecrets}} -ClusterName {{ClusterName}} ${ShareOption}
@@ -1712,17 +1608,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Node1Config.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Node1Config.ps1"}'
               commandLine: ./Node1Config.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -DomainDNSName {{DomainDNSName}} -WSFCNode1PrivateIP2 {{WSFCNode1PrivateIP2}} -ClusterName {{ClusterName}} -AdminSecret {{AdminSecrets}} -SQLSecret {{SQLSecrets}}
         - name: Node1Reboot1SQL
           action: aws:runCommand
@@ -1759,17 +1645,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
               commandLine: ./AdditionalNodeConfig.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -WSFCNodePrivateIP2 {{WSFCNode2PrivateIP2}} -ClusterName {{ClusterName}} -AdminSecret {{AdminSecrets}} -SQLSecret {{SQLSecrets}}
         - name: Node2Reboot1SQL
           action: aws:runCommand
@@ -1815,17 +1691,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
               commandLine: ./AdditionalNodeConfig.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -WSFCNodePrivateIP2 {{WSFCNode3PrivateIP2}} -ClusterName {{ClusterName}} -AdminSecret {{AdminSecrets}} -SQLSecret {{SQLSecrets}}
         - name: Node3Reboot1SQL
           action: aws:runCommand
@@ -1864,17 +1730,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Node1Config.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Node1Config.ps1"}'
               commandLine: ./Node1Config.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -DomainDNSName {{DomainDNSName}} -WSFCNode1PrivateIP2 {{WSFCNode1PrivateIP2}} -ClusterName {{ClusterName}} -AdminSecret {{AdminSecrets}}
         - name: ApplyWSFCNode1ConfigNoSQL
           action: aws:runCommand
@@ -1932,17 +1788,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
               commandLine: ./AdditionalNodeConfig.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -WSFCNodePrivateIP2 {{WSFCNode2PrivateIP2}} -ClusterName {{ClusterName}} -AdminSecret {{AdminSecrets}}
         - name: Node2Reboot1NoSQL
           action: aws:runCommand
@@ -1988,17 +1834,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/AdditionalNodeConfig.ps1"}'
               commandLine: ./AdditionalNodeConfig.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -WSFCNodePrivateIP2 {{WSFCNode3PrivateIP2}} -ClusterName {{ClusterName}} -AdminSecret {{AdminSecrets}}
         - name: Node3Reboot1NoSQL
           action: aws:runCommand
@@ -2035,17 +1871,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WSFCQuorumConfig.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WSFCQuorumConfig.ps1"}'
               commandLine:
                 !Sub
                   - ./WSFCQuorumConfig.ps1 ${QuorumOption}
@@ -2074,17 +1900,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WaitForCluster.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WaitForCluster.ps1"}'
               commandLine: ./WaitForCluster.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -AdminSecret {{AdminSecrets}} -NetBIOSName {{WSFCNode1NetBIOSName}}
         - name: ConfigurePermissionsOnMAD
           action: aws:runCommand
@@ -2099,16 +1915,7 @@ Resources:
             Parameters:
               sourceType: S3
               sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Configure-MAD-Permissions.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+                !Sub '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Configure-MAD-Permissions.ps1"}'
               commandLine: ./Configure-MAD-Permissions.ps1 -AdminSecret {{AdminSecrets}} -DomainNetBIOSName '{{DomainNetBIOSName}}' -wsfcName '{{ClusterName}}'
         - name: registerclustervolume
           action: aws:runCommand
@@ -2122,17 +1929,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/RegisterClusterVolume.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/RegisterClusterVolume.ps1"}'
               commandLine: ./RegisterClusterVolume.ps1 -Volume D
         - name: InstallSQLBranch
           action: aws:branch
@@ -2154,17 +1951,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/InstallSQLEE.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/InstallSQLEE.ps1"}'
               commandLine: ./InstallSQLEE.ps1 -SQLServerVersion 'SQL{{SQLServerVersion}}' -DomainNetBIOSName {{DomainNetBIOSName}} -AdminSecret {{AdminSecrets}} -SQLSecret {{SQLSecrets}} -NetBIOSName {{WSFCNode1NetBIOSName}} -SQLServerClusterIP {{WSFCNode1PrivateIP3}} -ClusterSubnetCidr {{PrivateSubnet1CIDR}}
         - name: SQLInstallNode2MOF
           action: aws:runCommand
@@ -2178,17 +1965,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/InstallSQLEE-AddNode.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/InstallSQLEE-AddNode.ps1"}'
               commandLine: ./InstallSQLEE-AddNode.ps1 -SQLServerVersion 'SQL{{SQLServerVersion}}' -DomainNetBIOSName {{DomainNetBIOSName}} -AdminSecret {{AdminSecrets}} -SQLSecret {{SQLSecrets}} -NetBIOSName {{WSFCNode2NetBIOSName}} -ClusterIPAddresses {{WSFCNode1PrivateIP3}},{{WSFCNode2PrivateIP3}} -ClusterSubnetCidrs {{PrivateSubnet1CIDR}},{{PrivateSubnet2CIDR}}
         - name: WaitForClusterGroup
           action: aws:runCommand
@@ -2202,17 +1979,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               sourceType: S3
-              sourceInfo:
-                !Sub
-                  - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WaitForClusterGroup.ps1"}'
-                  - S3Bucket: !If
-                      - UsingDefaultBucket
-                      - !Sub '${QSS3BucketName}-${AWS::Region}'
-                      - !Ref QSS3BucketName
-                    S3Region: !If
-                      - UsingDefaultBucket
-                      - !Ref AWS::Region
-                      - !Ref QSS3BucketRegion
+              sourceInfo: '{"path": "https://{{S3BucketName}}.s3.{{S3Region}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/WaitForClusterGroup.ps1"}'
               commandLine: ./WaitForClusterGroup.ps1 -DomainNetBIOSName {{DomainNetBIOSName}} -AdminSecret {{AdminSecrets}} -NetBIOSName {{WSFCNode2NetBIOSName}}
         # END INSTALL SQL branch3
         - name: DisableCredSSP
@@ -2227,7 +1994,7 @@ Resources:
               CloudWatchLogGroupName: !Ref QuickStartLogs
             Parameters:
               commands:
-                - Copy-S3Object -Bucket {{QSS3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/DisableCredSsp.ps1 -LocalFile C:\cfn\scripts\DisableCredSsp.ps1 -Region {{QSS3BucketRegion}}
+                - 'Copy-S3Object -Bucket {{S3BucketName}} -key {{QSS3KeyPrefix}}submodules/cfn-ps-microsoft-utilities/scripts/DisableCredSsp.ps1 -LocalFile C:\cfn\scripts\DisableCredSsp.ps1 -Region {{S3Region}}'
         - name: DisableCredSSPReboot
           action: aws:runCommand
           onFailure: step:signalfailure

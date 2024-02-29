@@ -171,7 +171,7 @@ Parameters:
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
-    Default: aws-ia
+    Default: aws-ia-us-east-1
     Description: S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
     Type: String
   QSS3BucketRegion:
@@ -228,15 +228,6 @@ Rules:
                 - - eu-west-3
                 - Ref: AWS::Region
         AssertDescription: M4 instances are not available in the Paris region
-Conditions:
-  UsingDefaultBucket:
-    Fn::Equals:
-      - Ref: QSS3BucketName
-      - aws-ia
-  GovCloudCondition:
-    Fn::Equals:
-      - Ref: AWS::Region
-      - us-gov-west-1
 Resources:
   QuickStartLogs:
     Type: AWS::Logs::LogGroup
@@ -374,19 +365,7 @@ Resources:
                   Ref: QuickStartLogs
               Parameters:
                 sourceType: S3
-                sourceInfo:
-                  Fn::Sub:
-                    - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/install-ad-modules.ps1"}'
-                    - S3Bucket:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                          - Ref: QSS3BucketName
-                      S3Region:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Ref: AWS::Region
-                          - Ref: QSS3BucketRegion
+                sourceInfo: '{"path": "https://{{QSS3BucketName}}.s3.{{QSS3BucketRegion}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/install-ad-modules.ps1"}'
                 commandLine: ./install-ad-modules.ps1
           - name: dcsLCMConfig
             action: aws:runCommand
@@ -402,19 +381,7 @@ Resources:
                   Ref: QuickStartLogs
               Parameters:
                 sourceType: S3
-                sourceInfo:
-                  Fn::Sub:
-                    - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/LCM-Config.ps1"}'
-                    - S3Bucket:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                          - Ref: QSS3BucketName
-                      S3Region:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Ref: AWS::Region
-                          - Ref: QSS3BucketRegion
+                sourceInfo: '{"path": "https://{{QSS3BucketName}}.s3.{{QSS3BucketRegion}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/LCM-Config.ps1"}'
                 commandLine: ./LCM-Config.ps1
           - name: dc1InstanceId
             action: aws:executeAwsApi
@@ -451,19 +418,7 @@ Resources:
                   Ref: QuickStartLogs
               Parameters:
                 sourceType: S3
-                sourceInfo:
-                  Fn::Sub:
-                    - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/ConfigDC1.ps1"}'
-                    - S3Bucket:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                          - Ref: QSS3BucketName
-                      S3Region:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Ref: AWS::Region
-                          - Ref: QSS3BucketRegion
+                sourceInfo: '{"path": "https://{{QSS3BucketName}}.s3.{{QSS3BucketRegion}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/ConfigDC1.ps1"}'
                 commandLine: ./ConfigDC1.ps1 -ADServer1NetBIOSName {{ADServer1NetBIOSName}} -DomainNetBIOSName {{DomainNetBIOSName}} -DomainDNSName {{DomainDNSName}} -ADAdminSecParam {{ADAdminSecParamName}}
                   -ADAltUserSecParam {{ADAltUserSecParamName}} -RestoreModeSecParam {{RestoreModeSecParamName}} -SiteName {{global:REGION}} -VPCCIDR {{VPCCIDR}}
           - name: configDC1
@@ -517,19 +472,7 @@ Resources:
                   Ref: QuickStartLogs
               Parameters:
                 sourceType: S3
-                sourceInfo:
-                  Fn::Sub:
-                    - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/ConfigDC2.ps1"}'
-                    - S3Bucket:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                          - Ref: QSS3BucketName
-                      S3Region:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Ref: AWS::Region
-                          - Ref: QSS3BucketRegion
+                sourceInfo: '{"path": "https://{{QSS3BucketName}}.s3.{{QSS3BucketRegion}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/ConfigDC2.ps1"}'
                 commandLine: ./ConfigDC2.ps1 -ADServer2NetBIOSName {{ADServer2NetBIOSName}} -DomainNetBIOSName {{DomainNetBIOSName}} -DomainDNSName {{DomainDNSName}} -ADServer1PrivateIP {{ADServer1PrivateIP}}
                   -ADAdminSecParam {{ADAdminSecParamName}}
           - name: configDC2
@@ -562,18 +505,7 @@ Resources:
               Parameters:
                 sourceType: S3
                 sourceInfo:
-                  Fn::Sub:
-                    - '{"path": "https://${S3Bucket}.s3.${S3Region}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Dns-Config.ps1"}'
-                    - S3Bucket:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                          - Ref: QSS3BucketName
-                      S3Region:
-                        Fn::If:
-                          - UsingDefaultBucket
-                          - Ref: AWS::Region
-                          - Ref: QSS3BucketRegion
+                  Fn::Sub: '{"path": "https://{{QSS3BucketName}}.s3.{{QSS3BucketRegion}}.{{URLSuffix}}/{{QSS3KeyPrefix}}scripts/Dns-Config.ps1"}'
                 commandLine: ./Dns-Config.ps1 -ADServer1NetBIOSName {{ADServer1NetBIOSName}} -ADServer2NetBIOSName {{ADServer2NetBIOSName}} -ADServer1PrivateIP {{ADServer1PrivateIP}} -ADServer2PrivateIP
                   {{ADServer2PrivateIP}} -DomainDNSName {{DomainDNSName}} -ADAdminSecParam {{ADAdminSecParamName}}
           - name: CFNSignalEnd
@@ -622,20 +554,8 @@ Resources:
                   - s3:GetObject
                   - s3:ListBucket
                 Resource:
-                  - Fn::Sub:
-                      - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
-                      - S3Bucket:
-                          Fn::If:
-                            - UsingDefaultBucket
-                            - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                            - Ref: QSS3BucketName
-                  - Fn::Sub:
-                      - arn:${AWS::Partition}:s3:::${S3Bucket}
-                      - S3Bucket:
-                          Fn::If:
-                            - UsingDefaultBucket
-                            - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                            - Ref: QSS3BucketName
+                  - arn:${AWS::Partition}:s3:::{{QSS3BucketName}}/${QSS3KeyPrefix}*
+                  - arn:${AWS::Partition}:s3:::{{QSS3BucketName}}
                 Effect: Allow
           PolicyName: aws-quick-start-s3-policy
         - PolicyDocument:
@@ -696,20 +616,8 @@ Resources:
                   - s3:GetObject
                   - s3:ListBucket
                 Resource:
-                  - Fn::Sub:
-                      - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
-                      - S3Bucket:
-                          Fn::If:
-                            - UsingDefaultBucket
-                            - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                            - Ref: QSS3BucketName
-                  - Fn::Sub:
-                      - arn:${AWS::Partition}:s3:::${S3Bucket}
-                      - S3Bucket:
-                          Fn::If:
-                            - UsingDefaultBucket
-                            - Fn::Sub: ${QSS3BucketName}-${AWS::Region}
-                            - Ref: QSS3BucketName
+                  - arn:${AWS::Partition}:s3:::{{QSS3BucketName}}/${QSS3KeyPrefix}*
+                  - arn:${AWS::Partition}:s3:::{{QSS3BucketName}}
                 Effect: Allow
           PolicyName: aws-quick-start-s3-policy
         - PolicyDocument:
@@ -872,15 +780,9 @@ Resources:
               - ;"VPCCIDR"=
               - Fn::Sub: '"${VPCCIDR}"'
               - ;"QSS3BucketName"=
-              - Fn::If:
-                  - UsingDefaultBucket
-                  - Fn::Sub: '"${QSS3BucketName}-${AWS::Region}"'
-                  - Fn::Sub: '"${QSS3BucketName}"'
+              - Fn::Sub: '"${QSS3BucketName}"'
               - ;"QSS3BucketRegion"=
-              - Fn::If:
-                  - UsingDefaultBucket
-                  - Fn::Sub: '"${AWS::Region}"'
-                  - Fn::Sub: '"${QSS3BucketRegion}"'
+              - Fn::Sub: '"${QSS3BucketRegion}"'
               - ;"QSS3KeyPrefix"=
               - Fn::Sub: '"${QSS3KeyPrefix}"'
               - ;"ADAdminSecParamName"=

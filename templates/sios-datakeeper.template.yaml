@@ -2674,13 +2674,12 @@ Resources:
             - !If
               - UsingDefaultBucket
               - !Sub '${QSS3BucketName}-${AWS::Region}'
-              - !Ref QSS3BucketName
+              - !Sub '${QSS3BucketName}'
             - ';"QSS3BucketRegion"='
             - !If
               - UsingDefaultBucket
-              - !Ref AWS::Region
-              - !Ref QSS3BucketRegion
-            - !Sub '"${QSS3BucketRegion}"'
+              - !Sub '${AWS::Region}'
+              - !Sub '${QSS3BucketRegion}'
             - ';"QSS3KeyPrefix"='
             - !Sub '"${QSS3KeyPrefix}"'
             - ';"StackName"='

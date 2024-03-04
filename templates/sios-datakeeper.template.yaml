@@ -2623,13 +2623,13 @@ Resources:
             - ';"QSS3BucketName"='
             - !If
               - UsingDefaultBucket
-              - !Sub '${QSS3BucketName}-${AWS::Region}'
-              - !Sub '${QSS3BucketName}'
+              - !Sub '"${QSS3BucketName}-${AWS::Region}"'
+              - !Sub '"${QSS3BucketName}"'
             - ';"QSS3BucketRegion"='
             - !If
               - UsingDefaultBucket
-              - !Sub '${AWS::Region}'
-              - !Sub '${QSS3BucketRegion}'
+              - !Sub '"${AWS::Region}"'
+              - !Sub '"${QSS3BucketRegion}"'
             - ';"QSS3KeyPrefix"='
             - !Sub '"${QSS3KeyPrefix}"'
             - ';"StackName"='

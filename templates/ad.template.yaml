@@ -4,6 +4,11 @@ Description: This template creates 2 Windows 2016 Active Directory Domain Contro
   AD instances fixed private IP addresses as the DNS server. **WARNING** This template creates Amazon EC2 Windows instance and related resources. You will be billed for the AWS resources used if you create
   a stack from this template. QS(0001) (qs-1ui8pln0o)
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W8001
+        - W9004
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:

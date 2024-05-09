@@ -10,6 +10,7 @@ Metadata:
   cfn-lint:
     config:
       ignore_checks:
+        - W7001
         - W9006
   QuickStartDocumentation:
     EntrypointName: Parameters for deploying into a new VPC
@@ -677,6 +678,61 @@ Mappings:
       WS2016: /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
       WS2019: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
       WS2022: /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
+  AWSAMIRegionMap:
+    ap-northeast-2:
+      SDKCEWIN2019BYOL: ami-0ce6bdba37a44b0ee
+    ap-south-1:
+      SDKCEWIN2019BYOL: ami-0e9176b12c065f2ad
+    ap-southeast-1:
+      SDKCEWIN2019BYOL: ami-09b5d28488fd72e1e
+    ap-southeast-2:
+      SDKCEWIN2019BYOL: ami-017325eea59d2b0ca
+    ca-central-1:
+      SDKCEWIN2019BYOL: ami-001e5bf6d03de960a
+    eu-central-1:
+      SDKCEWIN2019BYOL: ami-0d3a7cb465ac6c216
+    eu-north-1:
+      SDKCEWIN2019BYOL: ami-0c188147e53408f9a
+    eu-west-1:
+      SDKCEWIN2019BYOL: ami-0eee7c28c43322105
+    eu-west-2:
+      SDKCEWIN2019BYOL: ami-028d4141d377570b2
+    eu-west-3:
+      SDKCEWIN2019BYOL: ami-02280f36bffd0b002
+    sa-east-1:
+      SDKCEWIN2019BYOL: ami-08e3f6cce448bdcc5
+    us-east-1:
+      SDKCEWIN2019BYOL: ami-08e0bea89cdaed605
+    us-east-2:
+      SDKCEWIN2019BYOL: ami-0484b17ea0f4c10cc
+    us-west-1:
+      SDKCEWIN2019BYOL: ami-01c7309b2c3779929
+    us-west-2:
+      SDKCEWIN2019BYOL: ami-0209807f66af0b10c
+    eu-central-2:
+      SDKCEWIN2019BYOL: ami-0dc630df9655c76a9
+    eu-south-2:
+      SDKCEWIN2019BYOL: ami-0584caaf1604b3c43
+    ca-west-1:
+      SDKCEWIN2019BYOL: ami-0b80d99c7e8818b9b
+    il-central-1:
+      SDKCEWIN2019BYOL: ami-09ed455461e32a593
+    eu-south-1:
+      SDKCEWIN2019BYOL: ami-0b1cafde2aaa19934
+    ap-southeast-4:
+      SDKCEWIN2019BYOL: ami-05c6f8268e599a37b
+    ap-south-2:
+      SDKCEWIN2019BYOL: ami-051a6342560e5b88d
+    ap-east-1:
+      SDKCEWIN2019BYOL: ami-049ad9f3783c45ca8
+    me-central-1:
+      SDKCEWIN2019BYOL: ami-03c394d7317ce5031
+    af-south-1:
+      SDKCEWIN2019BYOL: ami-00b2d19f71525add6
+    ap-southeast-3:
+      SDKCEWIN2019BYOL: ami-059becd0526afa816
+    me-south-1:
+      SDKCEWIN2019BYOL: ami-0c800164ea1497ff2
 Conditions:
   IsTwoAz: !Equals [!Ref ThirdAZ, none]
   UseAWSDirectoryServiceEE: !Equals

@@ -10,6 +10,7 @@ Metadata:
   cfn-lint:
     config:
       ignore_checks:
+        - W7001
         - W9006
   QuickStartDocumentation:
     EntrypointName: Parameters for deploying into a new VPC
@@ -677,6 +678,61 @@ Mappings:
       WS2016: /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
       WS2019: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
       WS2022: /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
+  AWSAMIRegionMap:
+    ap-northeast-2:
+      SDKCEWIN2019: ami-07cf03789eac915a5
+    ap-south-1:
+      SDKCEWIN2019: ami-0a253c09c19b7258f
+    ap-southeast-1:
+      SDKCEWIN2019: ami-0bf4ae5fd6dea7f69
+    ap-southeast-2:
+      SDKCEWIN2019: ami-0496f2cbd8e226a6c
+    ca-central-1:
+      SDKCEWIN2019: ami-03e76bb82d32dcf81
+    eu-central-1:
+      SDKCEWIN2019: ami-06c9dc07cde263632
+    eu-north-1:
+      SDKCEWIN2019: ami-04a08e028eb5fa30b
+    eu-west-1:
+      SDKCEWIN2019: ami-06c51f8869741c998
+    eu-west-2:
+      SDKCEWIN2019: ami-031db17c7ed6fb28c
+    eu-west-3:
+      SDKCEWIN2019: ami-07c0f0a0e53c98417
+    sa-east-1:
+      SDKCEWIN2019: ami-05704c8fa834af7f7
+    us-east-1:
+      SDKCEWIN2019: ami-00a3596f4d1ce983b
+    us-east-2:
+      SDKCEWIN2019: ami-0b4239caea2edef96
+    us-west-1:
+      SDKCEWIN2019: ami-0f4a3540b60e94161
+    us-west-2:
+      SDKCEWIN2019: ami-07080a4acfe7320ba
+    eu-central-2:
+      SDKCEWIN2019: ami-0eb7a2ad5d6347a11
+    eu-south-2:
+      SDKCEWIN2019: ami-05454ece51ac0943f
+    ca-west-1:
+      SDKCEWIN2019: ami-0bedc1252de97cb63
+    il-central-1:
+      SDKCEWIN2019: ami-0c8782df19ca2ff2d
+    eu-south-1:
+      SDKCEWIN2019: ami-0694d26042d793927
+    ap-southeast-4:
+      SDKCEWIN2019: ami-046c4124bc44ce2dd
+    ap-south-2:
+      SDKCEWIN2019: ami-0b2d9e4e3ccf8adff
+    ap-east-1:
+      SDKCEWIN2019: ami-0ba26416231eb15b4
+    me-central-1:
+      SDKCEWIN2019: ami-0045f25cd25ebfbca
+    af-south-1:
+      SDKCEWIN2019: ami-087e1edb43387fa76
+    ap-southeast-3:
+      SDKCEWIN2019: ami-0158ac584431964e5
+    me-south-1:
+      SDKCEWIN2019: ami-0b44e9603ee772df3
 Conditions:
   IsTwoAz: !Equals [!Ref ThirdAZ, none]
   UseAWSDirectoryServiceEE: !Equals
